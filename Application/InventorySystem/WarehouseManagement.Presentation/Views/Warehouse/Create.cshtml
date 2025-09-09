@@ -1,0 +1,54 @@
+﻿@model WarehouseManagement.Core.ViewModels.WarehouseCreateViewModel
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Create Warehouse" : "Edit Warehouse";
+    bool isEdit = Model.Id != 0;
+    var isPrimaryChecked = Model.IsPrimary ? "checked" : null;
+    var isPrimaryDisabled = Model.IsPrimary ? "disabled" : null;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="@(isEdit ? "Edit" : "Create")" method="post">
+    @Html.AntiForgeryToken()
+
+    @if (isEdit)
+    {
+        <input type="hidden" asp-for="Id" />
+    }
+
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ShippingAddress"></label>
+        <input asp-for="ShippingAddress" class="form-control" />
+        <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="IsActive">Status</label>
+        <select asp-for="IsActive" class="form-control">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+        </select>
+    </div>
+
+    <div class="form-group form-check">
+        <input asp-for="IsPrimary" class="form-check-input" checked="@isPrimaryChecked" disabled="@isPrimaryDisabled" />
+        <label asp-for="IsPrimary" class="form-check-label">Primary Warehouse</label>
+        @if (Model.IsPrimary)
+        {
+            <small class="form-text text-muted">Primary warehouse cannot be unset via edit.</small>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
