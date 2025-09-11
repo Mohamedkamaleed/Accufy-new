@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\moham\\Desktop\\Accufy\\Application\\InventorySystem\\WarehouseManagement.Shared\\WarehouseManagement.Shared.csproj": {}
+    "E:\\DOT_NET_Core_MVC\\Accufy-new\\Application\\InventorySystem\\WarehouseManagement.Shared\\WarehouseManagement.Shared.csproj": {}
   },
   "projects": {
-    "C:\\Users\\moham\\Desktop\\Accufy\\Application\\InventorySystem\\WarehouseManagement.Shared\\WarehouseManagement.Shared.csproj": {
+    "E:\\DOT_NET_Core_MVC\\Accufy-new\\Application\\InventorySystem\\WarehouseManagement.Shared\\WarehouseManagement.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\moham\\Desktop\\Accufy\\Application\\InventorySystem\\WarehouseManagement.Shared\\WarehouseManagement.Shared.csproj",
+        "projectUniqueName": "E:\\DOT_NET_Core_MVC\\Accufy-new\\Application\\InventorySystem\\WarehouseManagement.Shared\\WarehouseManagement.Shared.csproj",
         "projectName": "WarehouseManagement.Shared",
-        "projectPath": "C:\\Users\\moham\\Desktop\\Accufy\\Application\\InventorySystem\\WarehouseManagement.Shared\\WarehouseManagement.Shared.csproj",
-        "packagesPath": "C:\\Users\\moham\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\moham\\Desktop\\Accufy\\Application\\InventorySystem\\WarehouseManagement.Shared\\obj\\",
+        "projectPath": "E:\\DOT_NET_Core_MVC\\Accufy-new\\Application\\InventorySystem\\WarehouseManagement.Shared\\WarehouseManagement.Shared.csproj",
+        "packagesPath": "C:\\Users\\ProSystem\\.nuget\\packages\\",
+        "outputPath": "E:\\DOT_NET_Core_MVC\\Accufy-new\\Application\\InventorySystem\\WarehouseManagement.Shared\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\moham\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ProSystem\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -65,7 +65,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

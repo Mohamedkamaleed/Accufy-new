@@ -1,7 +1,9 @@
 ﻿using System.Data;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using WarehouseManagement.Core.Data;
 using WarehouseManagement.Core.Entities;
 
 namespace WarehouseManagement.Core.Repositories
@@ -21,66 +23,84 @@ namespace WarehouseManagement.Core.Repositories
     }
     public class WarehouseRepository : IWarehouseRepository
     {
-        private readonly IDbConnection _db;
+        private readonly ApplicationDbContext _context;
 
-        public WarehouseRepository(IConfiguration config)
+        public WarehouseRepository(ApplicationDbContext context)
         {
-            _db = new SqlConnection(config.GetConnectionString("DefaultConnection"));
+            _context = context;
         }
 
         public async Task<IEnumerable<Warehouse>> GetAllAsync() =>
-            await _db.QueryAsync<Warehouse>("SELECT * FROM Warehouses");
+            await _context.Warehouses.AsNoTracking().ToListAsync();
 
         public async Task<Warehouse> GetByIdAsync(int id) =>
-            await _db.QueryFirstOrDefaultAsync<Warehouse>("SELECT * FROM Warehouses WHERE Id = @id", new { id });
+            await _context.Warehouses.FirstOrDefaultAsync(w => w.Id == id);
 
         public async Task<Warehouse> GetByNameAsync(string name) =>
-            await _db.QueryFirstOrDefaultAsync<Warehouse>("SELECT * FROM Warehouses WHERE Name = @name", new { name });
+            await _context.Warehouses.FirstOrDefaultAsync(w => w.Name == name);
 
         public async Task<Warehouse> GetPrimaryWarehouseAsync() =>
-            await _db.QueryFirstOrDefaultAsync<Warehouse>("SELECT * FROM Warehouses WHERE IsPrimary = 1");
+            await _context.Warehouses.FirstOrDefaultAsync(w => w.IsPrimary);
 
         public async Task<IEnumerable<Warehouse>> GetActiveWarehousesAsync() =>
-            await _db.QueryAsync<Warehouse>("SELECT * FROM Warehouses WHERE Status = 1");
+            await _context.Warehouses.Where(w => w.Status).AsNoTracking().ToListAsync();
 
         public async Task<bool> HasTransactionsAsync(int warehouseId)
         {
-            // Example stub: replace with actual transaction check
-            return false;
+            // Implement actual logic to check for transactions
+            // This is a placeholder - you'd need to check related entities
+            return await Task.FromResult(false);
         }
 
         public async Task AddAsync(Warehouse warehouse)
         {
-            string sql = @"
-            INSERT INTO Warehouses (Name, ShippingAddress, Status, IsPrimary)
-            VALUES (@Name, @ShippingAddress, @Status, @IsPrimary)";
-            await _db.ExecuteAsync(sql, warehouse);
+            await _context.Warehouses.AddAsync(warehouse);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Warehouse warehouse)
         {
-            string sql = @"
-            UPDATE Warehouses
-            SET Name = @Name,
-                ShippingAddress = @ShippingAddress,
-                Status = @Status,
-                IsPrimary = @IsPrimary
-            WHERE Id = @Id";
-            await _db.ExecuteAsync(sql, warehouse);
+            _context.Warehouses.Update(warehouse);
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Warehouse warehouse)
         {
-            string sql = "DELETE FROM Warehouses WHERE Id = @Id";
-            await _db.ExecuteAsync(sql, new { warehouse.Id });
+            _context.Warehouses.Remove(warehouse);
+            await _context.SaveChangesAsync();
         }
 
         public async Task SetPrimaryWarehouseAsync(int id)
         {
-            // Clear old primary
-            await _db.ExecuteAsync("UPDATE Warehouses SET IsPrimary = 0 WHERE IsPrimary = 1");
-            // Set new primary
-            await _db.ExecuteAsync("UPDATE Warehouses SET IsPrimary = 1 WHERE Id = @id", new { id });
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // Clear current primary
+                var currentPrimary = await _context.Warehouses
+                    .Where(w => w.IsPrimary)
+                    .ToListAsync();
+
+                foreach (var warehouse in currentPrimary)
+                {
+                    warehouse.IsPrimary = false;
+                }
+
+                // Set new primary
+                var newPrimary = await _context.Warehouses.FindAsync(id);
+                if (newPrimary != null)
+                {
+                    newPrimary.IsPrimary = true;
+                    newPrimary.Status = true; // Ensure primary is active
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
     }
 }
