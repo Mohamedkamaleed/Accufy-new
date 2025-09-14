@@ -1,7 +1,9 @@
 ﻿using Dapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using WarehouseManagement.Core.Data;
 using WarehouseManagement.Core.Entities;
 
 namespace WarehouseManagement.Core.Repositories
@@ -17,56 +19,57 @@ namespace WarehouseManagement.Core.Repositories
     }
     public class CategoryRepository : ICategoryRepository
     {
-        private readonly IDbConnection _db;
+        private readonly ApplicationDbContext _context;
 
-        public CategoryRepository(IConfiguration config)
+        public CategoryRepository(ApplicationDbContext context)
         {
-            _db = new SqlConnection(config.GetConnectionString("DefaultConnection"));
+            _context = context;
         }
 
         public async Task<IEnumerable<Category>> GetAllAsync()
         {
-            var sql = "SELECT * FROM Categories";
-            return await _db.QueryAsync<Category>(sql);
+            return await _context.Categories
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<Category?> GetByIdAsync(int id)
         {
-            var sql = "SELECT * FROM Categories WHERE CategoryID = @Id";
-            return await _db.QueryFirstOrDefaultAsync<Category>(sql, new { Id = id });
+            return await _context.Categories
+                .FirstOrDefaultAsync(c => c.CategoryID == id);
         }
 
         public async Task<Category?> GetByNameAsync(string name)
         {
-            var sql = "SELECT * FROM Categories WHERE Name = @Name";
-            return await _db.QueryFirstOrDefaultAsync<Category>(sql, new { Name = name });
+            return await _context.Categories
+                .FirstOrDefaultAsync(c => c.Name == name);
         }
 
         public async Task AddAsync(Category category)
         {
-            var sql = @"
-            INSERT INTO Categories (Name, Description, ParentCategoryID)
-            VALUES (@Name, @Description, @ParentCategoryID);
-            SELECT CAST(SCOPE_IDENTITY() as int)";
-            var id = await _db.QuerySingleAsync<int>(sql, category);
-            category.CategoryID = id;
+            await _context.Categories.AddAsync(category);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Category category)
         {
-            var sql = @"
-            UPDATE Categories
-            SET Name = @Name,
-                Description = @Description,
-                ParentCategoryID = @ParentCategoryID
-            WHERE CategoryID = @CategoryID";
-            await _db.ExecuteAsync(sql, category);
+            _context.Categories.Update(category);
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Category category)
         {
-            var sql = "DELETE FROM Categories WHERE CategoryID = @CategoryID";
-            await _db.ExecuteAsync(sql, new { category.CategoryID });
+            // Check if category has child categories
+            var hasChildren = await _context.Categories
+                .AnyAsync(c => c.ParentCategoryID == category.CategoryID);
+
+            if (hasChildren)
+            {
+                throw new InvalidOperationException("Cannot delete a category that has child categories.");
+            }
+
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
         }
     }
 

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using WarehouseManagement.Core.Data;
+using WarehouseManagement.Core.Data.Seeding;
 using WarehouseManagement.Core.Repositories;
 using WarehouseManagement.Core.Services;
 
@@ -9,8 +10,19 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 // Add PostgreSQL with Entity Framework Core
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add DbContext with async seeding
+// Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+// Register seeders
+builder.Services.AddScoped<IDataSeeder, CategoryDataSeeder>();
+builder.Services.AddScoped<IDataSeeder, WarehouseDataSeeder>();
 builder.Services.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
 builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
