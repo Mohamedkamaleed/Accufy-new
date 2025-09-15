@@ -1,8 +1,4 @@
-﻿using Dapper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System.Data;
-using System.Data.SqlClient;
+﻿using Microsoft.EntityFrameworkCore;
 using WarehouseManagement.Core.Data;
 using WarehouseManagement.Core.Entities;
 
