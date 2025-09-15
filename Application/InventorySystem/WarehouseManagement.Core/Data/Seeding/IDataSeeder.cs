@@ -148,7 +148,138 @@ namespace WarehouseManagement.Core.Data.Seeding
             await context.SaveChangesAsync(cancellationToken);
         }
     }
+    public class BrandDataSeeder : IDataSeeder
+    {
+        public async Task SeedAsync(ApplicationDbContext context, CancellationToken cancellationToken = default)
+        {
+            // Check if specific brands already exist by name to avoid duplicates
+            var existingBrands = await context.Brands
+                .Select(b => b.Name)
+                .ToListAsync(cancellationToken);
 
+            var brandsToAdd = new List<Brand>();
+
+            // Add popular electronics brands
+            if (!existingBrands.Contains("Apple"))
+            {
+                brandsToAdd.Add(new Brand { Name = "Apple" });
+            }
+
+            if (!existingBrands.Contains("Samsung"))
+            {
+                brandsToAdd.Add(new Brand { Name = "Samsung" });
+            }
+
+            if (!existingBrands.Contains("Dell"))
+            {
+                brandsToAdd.Add(new Brand { Name = "Dell" });
+            }
+
+            if (!existingBrands.Contains("HP"))
+            {
+                brandsToAdd.Add(new Brand { Name = "HP" });
+            }
+
+            if (!existingBrands.Contains("Lenovo"))
+            {
+                brandsToAdd.Add(new Brand { Name = "Lenovo" });
+            }
+
+            if (!existingBrands.Contains("Sony"))
+            {
+                brandsToAdd.Add(new Brand { Name = "Sony" });
+            }
+
+            // Add furniture brands
+            if (!existingBrands.Contains("IKEA"))
+            {
+                brandsToAdd.Add(new Brand { Name = "IKEA" });
+            }
+
+            if (!existingBrands.Contains("Herman Miller"))
+            {
+                brandsToAdd.Add(new Brand { Name = "Herman Miller" });
+            }
+
+            if (!existingBrands.Contains("Steelcase"))
+            {
+                brandsToAdd.Add(new Brand { Name = "Steelcase" });
+            }
+
+            if (brandsToAdd.Any())
+            {
+                await context.Brands.AddRangeAsync(brandsToAdd, cancellationToken);
+                await context.SaveChangesAsync(cancellationToken);
+            }
+        }
+    }
+
+    public class SupplierDataSeeder : IDataSeeder
+    {
+        public async Task SeedAsync(ApplicationDbContext context, CancellationToken cancellationToken = default)
+        {
+            // Check if specific suppliers already exist by name to avoid duplicates
+            var existingSuppliers = await context.Suppliers
+                .Select(s => s.Name)
+                .ToListAsync(cancellationToken);
+
+            var suppliersToAdd = new List<Supplier>();
+
+            // Add electronics suppliers
+            if (!existingSuppliers.Contains("Tech Distributors Inc."))
+            {
+                suppliersToAdd.Add(new Supplier { Name = "Tech Distributors Inc." });
+            }
+
+            if (!existingSuppliers.Contains("Global Electronics Supply"))
+            {
+                suppliersToAdd.Add(new Supplier { Name = "Global Electronics Supply" });
+            }
+
+            if (!existingSuppliers.Contains("Mobile Device Wholesalers"))
+            {
+                suppliersToAdd.Add(new Supplier { Name = "Mobile Device Wholesalers" });
+            }
+
+            if (!existingSuppliers.Contains("Computer Parts Unlimited"))
+            {
+                suppliersToAdd.Add(new Supplier { Name = "Computer Parts Unlimited" });
+            }
+
+            // Add furniture suppliers
+            if (!existingSuppliers.Contains("Office Furniture Solutions"))
+            {
+                suppliersToAdd.Add(new Supplier { Name = "Office Furniture Solutions" });
+            }
+
+            if (!existingSuppliers.Contains("Home & Office Decor Ltd."))
+            {
+                suppliersToAdd.Add(new Supplier { Name = "Home & Office Decor Ltd." });
+            }
+
+            if (!existingSuppliers.Contains("Ergonomic Workspace Suppliers"))
+            {
+                suppliersToAdd.Add(new Supplier { Name = "Ergonomic Workspace Suppliers" });
+            }
+
+            // Add general suppliers
+            if (!existingSuppliers.Contains("General Wholesale Distributors"))
+            {
+                suppliersToAdd.Add(new Supplier { Name = "General Wholesale Distributors" });
+            }
+
+            if (!existingSuppliers.Contains("Regional Supply Chain Partners"))
+            {
+                suppliersToAdd.Add(new Supplier { Name = "Regional Supply Chain Partners" });
+            }
+
+            if (suppliersToAdd.Any())
+            {
+                await context.Suppliers.AddRangeAsync(suppliersToAdd, cancellationToken);
+                await context.SaveChangesAsync(cancellationToken);
+            }
+        }
+    }
     public class CompositeDataSeeder : IDataSeeder
     {
         private readonly IEnumerable<IDataSeeder> _seeders;

@@ -1,20 +1,20 @@
 ﻿@using WarehouseManagement.Core.ViewModels
 @using WarehouseManagement.Core.ViewModels.Common
-@model List<WarehouseManagement.Core.ViewModels.CategoryListViewModel>
+@model List<WarehouseManagement.Core.ViewModels.SupplierListViewModel>
 
 @{
-    ViewData["Title"] = "Categories";
+    ViewData["Title"] = "Suppliers";
 }
 
-<h2>Categories</h2>
+<h2>Suppliers</h2>
 
-<a class="btn btn-primary mb-3" asp-action="Create">+ Add Category</a>
+<a class="btn btn-primary mb-3" asp-action="Create">+ Add Supplier</a>
 
 <!-- Filter Form -->
 <form asp-action="Index" method="get" class="form-inline mb-3">
     <input type="text" name="search" class="form-control mr-2" placeholder="Search by name" value="@Context.Request.Query["search"]" />
 
-    <select name="parentCategoryId" class="form-control" asp-items="ViewBag.ParentCategories">
+    <select name="parentSupplierId" class="form-control" asp-items="ViewBag.ParentSuppliers">
         <option value="">-- None --</option>
     </select>
     <button type="submit" class="btn btn-secondary">Filter</button>
@@ -25,20 +25,18 @@
         <tr>
             <th>Name</th>
             <th>Description</th>
-            <th>Parent Category</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var category in Model)
+        @foreach (var Supplier in Model)
         {
             <tr>
-                <td>@category.Name</td>
-                <td>@category.Description</td>
-                <td>@category.ParentCategoryName</td>
+                <td>@Supplier.Name</td>
+                <td>@Supplier.Description</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@category.CategoryID" class="btn btn-sm btn-warning">Edit</a>
-                    <form asp-action="Delete" asp-route-id="@category.CategoryID" method="post" class="d-inline">
+                    <a asp-action="Edit" asp-route-id="@Supplier.SupplierID" class="btn btn-sm btn-warning">Edit</a>
+                    <form asp-action="Delete" asp-route-id="@Supplier.SupplierID" method="post" class="d-inline">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?');">Delete</button>
                     </form>

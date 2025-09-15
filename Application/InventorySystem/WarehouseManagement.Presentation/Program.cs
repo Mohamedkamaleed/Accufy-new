@@ -21,6 +21,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Keep these:
 builder.Services.AddScoped<IDataSeeder, CategoryDataSeeder>();
 builder.Services.AddScoped<IDataSeeder, WarehouseDataSeeder>();
+builder.Services.AddScoped<IDataSeeder, BrandDataSeeder>();
+builder.Services.AddScoped<IDataSeeder, SupplierDataSeeder>();
 
 // Add CompositeDataSeeder as a separate service
 builder.Services.AddScoped<CompositeDataSeeder>();
