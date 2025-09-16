@@ -48,8 +48,8 @@ namespace WarehouseManagement.Presentation.Controllers
                     Name = g.Name,
                     CategoryID = g.CategoryID,
                     CategoryName = g.Category.Name,
-                    BrandID = g.BrandID,
-                    BrandName = g.Brand.Name,
+                    //BrandID = g.BrandID,
+                    //BrandName = g.Brand.Name,
                     Description = g.Description,
                     ProductCount = 50
                 })
