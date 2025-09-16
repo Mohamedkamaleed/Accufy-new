@@ -1,0 +1,62 @@
+﻿@using WarehouseManagement.Core.ViewModels
+@using WarehouseManagement.Core.ViewModels.Common
+@model IEnumerable<ProductViewModel>
+
+<div class="container mt-4">
+    <h2>Products</h2>
+
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <input name="search" type="text" class="form-control" placeholder="Search..." value="@Context.Request.Query["search"]">
+        </div>
+        <div class="col-md-3">
+            <select name="categoryId" class="form-select" asp-items="ViewBag.Categories">
+                <option value="">All Categories</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="brandId" class="form-select" asp-items="ViewBag.Brands">
+                <option value="">All Brands</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+    </form>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>SKU</th>
+                <th>Category</th>
+                <th>Brand</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.SKU</td>
+                    <td>@product.CategoryName</td>
+                    <td>@product.BrandName</td>
+                    <td>@product.SellingPrice?.ToString("C")</td>
+                    <td>@product.InitialStock</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@product.ProductID" class="btn btn-sm btn-warning">Edit</a>
+                        <form asp-action="Delete" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@product.ProductID" />
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a asp-action="Create" class="btn btn-success">Create New</a>
+</div>

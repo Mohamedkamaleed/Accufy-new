@@ -23,6 +23,10 @@ builder.Services.AddScoped<IDataSeeder, CategoryDataSeeder>();
 builder.Services.AddScoped<IDataSeeder, WarehouseDataSeeder>();
 builder.Services.AddScoped<IDataSeeder, BrandDataSeeder>();
 builder.Services.AddScoped<IDataSeeder, SupplierDataSeeder>();
+builder.Services.AddScoped<IDataSeeder, ServiceDataSeeder>();
+builder.Services.AddScoped<IDataSeeder, ItemGroupDataSeeder>();
+builder.Services.AddScoped<IDataSeeder, ItemGroupItemDataSeeder>();
+
 
 // Add CompositeDataSeeder as a separate service
 builder.Services.AddScoped<CompositeDataSeeder>();
@@ -43,7 +47,16 @@ builder.Services.AddScoped<IBrandsService, BrandsService>();
 builder.Services.AddScoped<ISuppliersRepository, SuppliersRepository>();
 builder.Services.AddScoped<ISuppliersService, SuppliersService>();
 
+// Register repositories
+builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
 
+// Register services
+builder.Services.AddScoped<IProductsService, ProductsService>();
+// Register repositories
+builder.Services.AddScoped<IItemGroupsRepository, ItemGroupsRepository>();
+
+// Register services
+builder.Services.AddScoped<IItemGroupsService, ItemGroupsService>();
 
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>

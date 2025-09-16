@@ -280,6 +280,225 @@ namespace WarehouseManagement.Core.Data.Seeding
             }
         }
     }
+
+    public class ServiceDataSeeder : IDataSeeder
+    {
+        public async Task SeedAsync(ApplicationDbContext context, CancellationToken cancellationToken = default)
+        {
+            // Check if services already exist
+            if (await context.Services.AnyAsync(cancellationToken))
+            {
+                return;
+            }
+
+            // Get categories and suppliers for relationships
+            var categories = await context.Categories.ToListAsync(cancellationToken);
+            var suppliers = await context.Suppliers.ToListAsync(cancellationToken);
+
+            var electronicsCategory = categories.FirstOrDefault(c => c.Name == "Electronics");
+            var furnitureCategory = categories.FirstOrDefault(c => c.Name == "Furniture");
+            var techSupplier = suppliers.FirstOrDefault(s => s.Name.Contains("Tech"));
+            var furnitureSupplier = suppliers.FirstOrDefault(s => s.Name.Contains("Furniture"));
+
+            var services = new List<Service>
+        {
+            new Service
+            {
+                Name = "Device Repair Service",
+                Code = "DEV-REP-001",
+                Description = "Professional repair service for electronic devices",
+                CategoryID = electronicsCategory?.CategoryID,
+                SupplierID = techSupplier?.SupplierID,
+                PurchasePrice = 25.00m,
+                UnitPrice = 75.00m,
+                MinPrice = 50.00m,
+                Status = true
+            },
+            new Service
+            {
+                Name = "IT Support Consultation",
+                Code = "IT-SUP-001",
+                Description = "Professional IT support and consultation services",
+                CategoryID = electronicsCategory?.CategoryID,
+                SupplierID = techSupplier?.SupplierID,
+                PurchasePrice = 40.00m,
+                UnitPrice = 100.00m,
+                MinPrice = 80.00m,
+                Status = true
+            },
+            new Service
+            {
+                Name = "Furniture Assembly",
+                Code = "FURN-ASS-001",
+                Description = "Professional furniture assembly service",
+                CategoryID = furnitureCategory?.CategoryID,
+                SupplierID = furnitureSupplier?.SupplierID,
+                PurchasePrice = 30.00m,
+                UnitPrice = 80.00m,
+                MinPrice = 60.00m,
+                Status = true
+            },
+            new Service
+            {
+                Name = "Office Setup Service",
+                Code = "OFF-SET-001",
+                Description = "Complete office setup and organization service",
+                CategoryID = furnitureCategory?.CategoryID,
+                SupplierID = furnitureSupplier?.SupplierID,
+                PurchasePrice = 50.00m,
+                UnitPrice = 150.00m,
+                MinPrice = 120.00m,
+                Status = true
+            }
+        };
+
+            await context.Services.AddRangeAsync(services, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    public class ItemGroupDataSeeder : IDataSeeder
+    {
+        public async Task SeedAsync(ApplicationDbContext context, CancellationToken cancellationToken = default)
+        {
+            // Check if item groups already exist
+            if (await context.ItemGroups.AnyAsync(cancellationToken))
+            {
+                return;
+            }
+
+            // Get categories and brands for relationships
+            var categories = await context.Categories.ToListAsync(cancellationToken);
+            var brands = await context.Brands.ToListAsync(cancellationToken);
+
+            var electronicsCategory = categories.FirstOrDefault(c => c.Name == "Electronics");
+            var furnitureCategory = categories.FirstOrDefault(c => c.Name == "Furniture");
+            var appleBrand = brands.FirstOrDefault(b => b.Name == "Apple");
+            var samsungBrand = brands.FirstOrDefault(b => b.Name == "Samsung");
+            var ikeaBrand = brands.FirstOrDefault(b => b.Name == "IKEA");
+
+            var itemGroups = new List<ItemGroup>
+        {
+            new ItemGroup
+            {
+                Name = "Apple Devices",
+                CategoryID = electronicsCategory?.CategoryID,
+                BrandID = appleBrand?.BrandID,
+                Description = "All Apple products including iPhones, MacBooks, and accessories"
+            },
+            new ItemGroup
+            {
+                Name = "Samsung Electronics",
+                CategoryID = electronicsCategory?.CategoryID,
+                BrandID = samsungBrand?.BrandID,
+                Description = "Samsung smartphones, tablets, and electronics"
+            },
+            new ItemGroup
+            {
+                Name = "IKEA Furniture Sets",
+                CategoryID = furnitureCategory?.CategoryID,
+                BrandID = ikeaBrand?.BrandID,
+                Description = "Complete furniture sets from IKEA"
+            },
+            new ItemGroup
+            {
+                Name = "Office Chairs Collection",
+                CategoryID = furnitureCategory?.CategoryID,
+                Description = "Various office chairs from different brands"
+            }
+        };
+
+            await context.ItemGroups.AddRangeAsync(itemGroups, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+
+    public class ItemGroupItemDataSeeder : IDataSeeder
+    {
+        public async Task SeedAsync(ApplicationDbContext context, CancellationToken cancellationToken = default)
+        {
+            // Check if item group items already exist
+            if (await context.ItemGroupItems.AnyAsync(cancellationToken))
+            {
+                return;
+            }
+
+            // Get item groups and products for relationships
+            var itemGroups = await context.ItemGroups.ToListAsync(cancellationToken);
+            var products = await context.Products.ToListAsync(cancellationToken);
+
+            var appleGroup = itemGroups.FirstOrDefault(g => g.Name == "Apple Devices");
+            var samsungGroup = itemGroups.FirstOrDefault(g => g.Name == "Samsung Electronics");
+            var ikeaGroup = itemGroups.FirstOrDefault(g => g.Name == "IKEA Furniture Sets");
+            var officeChairsGroup = itemGroups.FirstOrDefault(g => g.Name == "Office Chairs Collection");
+
+            var iphoneProduct = products.FirstOrDefault(p => p.Name.Contains("iPhone"));
+            var macbookProduct = products.FirstOrDefault(p => p.Name.Contains("MacBook"));
+            var samsungPhone = products.FirstOrDefault(p => p.Name.Contains("Samsung Galaxy"));
+            var officeChair = products.FirstOrDefault(p => p.Name.Contains("Office Chair"));
+
+            var itemGroupItems = new List<ItemGroupItem>();
+
+            if (appleGroup != null && iphoneProduct != null)
+            {
+                itemGroupItems.Add(new ItemGroupItem
+                {
+                    GroupID = appleGroup.GroupID,
+                    ProductID = iphoneProduct.ProductID,
+                    SKU = "APP-IPH-001",
+                    PurchasePrice = 600.00m,
+                    SellingPrice = 999.99m,
+                    Barcode = "1234567890123"
+                });
+            }
+
+            if (appleGroup != null && macbookProduct != null)
+            {
+                itemGroupItems.Add(new ItemGroupItem
+                {
+                    GroupID = appleGroup.GroupID,
+                    ProductID = macbookProduct.ProductID,
+                    SKU = "APP-MAC-001",
+                    PurchasePrice = 1200.00m,
+                    SellingPrice = 1999.99m,
+                    Barcode = "1234567890124"
+                });
+            }
+
+            if (samsungGroup != null && samsungPhone != null)
+            {
+                itemGroupItems.Add(new ItemGroupItem
+                {
+                    GroupID = samsungGroup.GroupID,
+                    ProductID = samsungPhone.ProductID,
+                    SKU = "SAM-GAL-001",
+                    PurchasePrice = 450.00m,
+                    SellingPrice = 799.99m,
+                    Barcode = "1234567890125"
+                });
+            }
+
+            if (officeChairsGroup != null && officeChair != null)
+            {
+                itemGroupItems.Add(new ItemGroupItem
+                {
+                    GroupID = officeChairsGroup.GroupID,
+                    ProductID = officeChair.ProductID,
+                    SKU = "OFF-CHA-001",
+                    PurchasePrice = 150.00m,
+                    SellingPrice = 299.99m,
+                    Barcode = "1234567890126"
+                });
+            }
+
+            if (itemGroupItems.Any())
+            {
+                await context.ItemGroupItems.AddRangeAsync(itemGroupItems, cancellationToken);
+                await context.SaveChangesAsync(cancellationToken);
+            }
+        }
+    }
     public class CompositeDataSeeder : IDataSeeder
     {
         private readonly IEnumerable<IDataSeeder> _seeders;
