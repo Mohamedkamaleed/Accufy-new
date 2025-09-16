@@ -69,5 +69,9 @@ namespace WarehouseManagement.Core.Entities
 
         // Navigation property
         public ItemGroup? ItemGroup { get; set; }
+
+
+
+        public ICollection<ProductTaxProfile> ProductTaxProfiles { get; set; } = new List<ProductTaxProfile>();
     }
 }

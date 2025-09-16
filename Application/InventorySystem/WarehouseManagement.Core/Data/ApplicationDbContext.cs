@@ -19,6 +19,11 @@ namespace WarehouseManagement.Core.Data
         public DbSet<ItemGroup> ItemGroups { get; set; }
         public DbSet<ItemGroupItem> ItemGroupItems { get; set; }
 
+        public DbSet<ProductTaxProfile> ProductTaxProfiles { get; set; }
+
+        public DbSet<DefaultTax> DefaultTaxes { get; set; }
+        public DbSet<TaxProfile> TaxProfiles { get; set; }
+        public DbSet<TaxProfileTax> TaxProfileTaxes { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -211,6 +216,150 @@ namespace WarehouseManagement.Core.Data
                 entity.HasIndex(g => g.BrandID);
             });
 
+            // ItemGroupItem configuration
+            modelBuilder.Entity<ItemGroupItem>(entity =>
+            {
+                entity.ToTable("ItemGroupItems");
+                entity.HasKey(i => i.GroupItemID);
+
+                entity.Property(i => i.SKU)
+                    .HasMaxLength(100);
+
+                entity.Property(i => i.Barcode)
+                    .HasMaxLength(100);
+
+                entity.Property(i => i.PurchasePrice)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(i => i.SellingPrice)
+                    .HasColumnType("decimal(18,2)");
+
+                // Relationships
+                entity.HasOne(i => i.ItemGroup)
+                    .WithMany()
+                    .HasForeignKey(i => i.GroupID)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(i => i.Product)
+                    .WithMany()
+                    .HasForeignKey(i => i.ProductID)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Indexes
+                entity.HasIndex(i => new { i.GroupID, i.ProductID })
+                    .IsUnique();
+
+                entity.HasIndex(i => i.SKU)
+                    .IsUnique()
+                    .HasFilter("[SKU] IS NOT NULL");
+
+                entity.HasIndex(i => i.Barcode)
+                    .IsUnique()
+                    .HasFilter("[Barcode] IS NOT NULL");
+            });
+
+
+            // ProductTaxProfile configuration
+            modelBuilder.Entity<ProductTaxProfile>(entity =>
+            {
+                entity.ToTable("ProductTaxProfiles");
+                entity.HasKey(pt => new { pt.ProductID, pt.TaxProfileID });
+
+                entity.Property(pt => pt.IsPrimary)
+                    .HasDefaultValue(false);
+
+                // Relationships
+                entity.HasOne(pt => pt.Product)
+                    .WithMany(p => p.ProductTaxProfiles)
+                    .HasForeignKey(pt => pt.ProductID)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(pt => pt.TaxProfile)
+                    .WithMany(tp => tp.ProductTaxProfiles)
+                    .HasForeignKey(pt => pt.TaxProfileID)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+
+            // TaxProfile configuration (if not already defined)
+            modelBuilder.Entity<TaxProfile>(entity =>
+            {
+                entity.ToTable("TaxProfiles");
+                entity.HasKey(tp => tp.TaxProfileID);
+
+                entity.Property(tp => tp.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(tp => tp.TaxRate)
+                    .HasColumnType("decimal(5,2)");
+
+                entity.Property(tp => tp.Description)
+                    .HasMaxLength(500);
+
+                entity.HasIndex(tp => tp.Name)
+                    .IsUnique();
+            });
+
+
+
+
+            // DefaultTax configuration
+            modelBuilder.Entity<DefaultTax>(entity =>
+            {
+                entity.ToTable("DefaultTaxes");
+                entity.HasKey(t => t.TaxID);
+
+                entity.Property(t => t.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(t => t.TaxValue)
+                    .HasColumnType("decimal(10,4)");
+
+                entity.Property(t => t.Type)
+                    .IsRequired()
+                    .HasMaxLength(20);
+
+                entity.Property(t => t.Mode)
+                    .IsRequired()
+                    .HasMaxLength(20);
+
+                entity.HasIndex(t => t.Name)
+                    .IsUnique();
+            });
+
+            // TaxProfile configuration
+            modelBuilder.Entity<TaxProfile>(entity =>
+            {
+                entity.ToTable("TaxProfiles");
+                entity.HasKey(tp => tp.TaxProfileID);
+
+                entity.Property(tp => tp.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.HasIndex(tp => tp.Name)
+                    .IsUnique();
+            });
+
+            // TaxProfileTax configuration (join table)
+            modelBuilder.Entity<TaxProfileTax>(entity =>
+            {
+                entity.ToTable("TaxProfileTaxes");
+                entity.HasKey(tpt => new { tpt.TaxProfileID, tpt.TaxID });
+
+                // Relationships
+                entity.HasOne(tpt => tpt.TaxProfile)
+                    .WithMany(tp => tp.TaxProfileTaxes)
+                    .HasForeignKey(tpt => tpt.TaxProfileID)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(tpt => tpt.DefaultTax)
+                    .WithMany(t => t.TaxProfileTaxes)
+                    .HasForeignKey(tpt => tpt.TaxID)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
 
             // Apply all configurations from the current assembly
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

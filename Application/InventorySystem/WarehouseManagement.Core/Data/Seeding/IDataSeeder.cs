@@ -499,6 +499,249 @@ namespace WarehouseManagement.Core.Data.Seeding
             }
         }
     }
+
+
+    public class ProductTaxProfileDataSeeder : IDataSeeder
+    {
+        public async Task SeedAsync(ApplicationDbContext context, CancellationToken cancellationToken = default)
+        {
+            // Check if product tax profiles already exist
+            if (await context.ProductTaxProfiles.AnyAsync(cancellationToken))
+            {
+                return;
+            }
+
+            // Get products and tax profiles for relationships
+            var products = await context.Products.Take(5).ToListAsync(cancellationToken);
+            var taxProfiles = await context.TaxProfiles.Take(2).ToListAsync(cancellationToken);
+
+            if (!products.Any() || !taxProfiles.Any())
+            {
+                return; // Need products and tax profiles first
+            }
+
+            var productTaxProfiles = new List<ProductTaxProfile>();
+
+            // Assign first tax profile as primary for first product
+            if (products.Count > 0 && taxProfiles.Count > 0)
+            {
+                productTaxProfiles.Add(new ProductTaxProfile
+                {
+                    ProductID = products[0].ProductID,
+                    TaxProfileID = taxProfiles[0].TaxProfileID,
+                    IsPrimary = true
+                });
+            }
+
+            // Assign second tax profile to first product (non-primary)
+            if (products.Count > 0 && taxProfiles.Count > 1)
+            {
+                productTaxProfiles.Add(new ProductTaxProfile
+                {
+                    ProductID = products[0].ProductID,
+                    TaxProfileID = taxProfiles[1].TaxProfileID,
+                    IsPrimary = false
+                });
+            }
+
+            // Assign tax profiles to other products
+            for (int i = 1; i < Math.Min(products.Count, 4); i++)
+            {
+                var taxProfile = taxProfiles[i % taxProfiles.Count];
+                productTaxProfiles.Add(new ProductTaxProfile
+                {
+                    ProductID = products[i].ProductID,
+                    TaxProfileID = taxProfile.TaxProfileID,
+                    IsPrimary = true
+                });
+            }
+
+            if (productTaxProfiles.Any())
+            {
+                await context.ProductTaxProfiles.AddRangeAsync(productTaxProfiles, cancellationToken);
+                await context.SaveChangesAsync(cancellationToken);
+            }
+        }
+    }
+
+
+    public class DefaultTaxDataSeeder : IDataSeeder
+    {
+        public async Task SeedAsync(ApplicationDbContext context, CancellationToken cancellationToken = default)
+        {
+            // Check if default taxes already exist
+            if (await context.DefaultTaxes.AnyAsync(cancellationToken))
+            {
+                return;
+            }
+
+            var defaultTaxes = new List<DefaultTax>
+        {
+            new DefaultTax
+            {
+                Name = "VAT Standard",
+                TaxValue = 20.0m,
+                Type = "Percentage",
+                Mode = "Exclusive"
+            },
+            new DefaultTax
+            {
+                Name = "VAT Reduced",
+                TaxValue = 5.0m,
+                Type = "Percentage",
+                Mode = "Exclusive"
+            },
+            new DefaultTax
+            {
+                Name = "Sales Tax",
+                TaxValue = 8.5m,
+                Type = "Percentage",
+                Mode = "Exclusive"
+            },
+            new DefaultTax
+            {
+                Name = "Import Duty",
+                TaxValue = 10.0m,
+                Type = "Percentage",
+                Mode = "Included"
+            },
+            new DefaultTax
+            {
+                Name = "Environmental Fee",
+                TaxValue = 5.0m,
+                Type = "Fixed",
+                Mode = "Exclusive"
+            }
+        };
+
+            await context.DefaultTaxes.AddRangeAsync(defaultTaxes, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+
+    //public class DefaultTaxDataSeeder : IDataSeeder
+    //{
+    //    public async Task SeedAsync(ApplicationDbContext context, CancellationToken cancellationToken = default)
+    //    {
+    //        // Check if default taxes already exist
+    //        if (await context.DefaultTaxes.AnyAsync(cancellationToken))
+    //        {
+    //            return;
+    //        }
+
+    //        var defaultTaxes = new List<DefaultTax>
+    //    {
+    //        new DefaultTax
+    //        {
+    //            Name = "VAT Standard",
+    //            TaxValue = 20.0m,
+    //            Type = "Percentage",
+    //            Mode = "Exclusive"
+    //        },
+    //        new DefaultTax
+    //        {
+    //            Name = "VAT Reduced",
+    //            TaxValue = 5.0m,
+    //            Type = "Percentage",
+    //            Mode = "Exclusive"
+    //        },
+    //        new DefaultTax
+    //        {
+    //            Name = "Sales Tax",
+    //            TaxValue = 8.5m,
+    //            Type = "Percentage",
+    //            Mode = "Exclusive"
+    //        },
+    //        new DefaultTax
+    //        {
+    //            Name = "Import Duty",
+    //            TaxValue = 10.0m,
+    //            Type = "Percentage",
+    //            Mode = "Included"
+    //        },
+    //        new DefaultTax
+    //        {
+    //            Name = "Environmental Fee",
+    //            TaxValue = 5.0m,
+    //            Type = "Fixed",
+    //            Mode = "Exclusive"
+    //        }
+    //    };
+
+    //        await context.DefaultTaxes.AddRangeAsync(defaultTaxes, cancellationToken);
+    //        await context.SaveChangesAsync(cancellationToken);
+    //    }
+    //}
+
+    public class TaxProfileDataSeeder : IDataSeeder
+    {
+        public async Task SeedAsync(ApplicationDbContext context, CancellationToken cancellationToken = default)
+        {
+            // Check if tax profiles already exist
+            if (await context.TaxProfiles.AnyAsync(cancellationToken))
+            {
+                return;
+            }
+
+            // Get default taxes
+            var defaultTaxes = await context.DefaultTaxes.ToListAsync(cancellationToken);
+            if (!defaultTaxes.Any())
+            {
+                return; // Need default taxes first
+            }
+
+            var vatStandard = defaultTaxes.FirstOrDefault(t => t.Name == "VAT Standard");
+            var vatReduced = defaultTaxes.FirstOrDefault(t => t.Name == "VAT Reduced");
+            var environmentalFee = defaultTaxes.FirstOrDefault(t => t.Name == "Environmental Fee");
+
+            var taxProfiles = new List<TaxProfile>
+        {
+            new TaxProfile { Name = "Standard VAT Profile" },
+            new TaxProfile { Name = "Reduced VAT Profile" },
+            new TaxProfile { Name = "Electronic Goods Profile" }
+        };
+
+            await context.TaxProfiles.AddRangeAsync(taxProfiles, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+
+            // Add taxes to profiles
+            if (vatStandard != null)
+            {
+                context.TaxProfileTaxes.Add(new TaxProfileTax
+                {
+                    TaxProfileID = taxProfiles[0].TaxProfileID,
+                    TaxID = vatStandard.TaxID
+                });
+            }
+
+            if (vatReduced != null)
+            {
+                context.TaxProfileTaxes.Add(new TaxProfileTax
+                {
+                    TaxProfileID = taxProfiles[1].TaxProfileID,
+                    TaxID = vatReduced.TaxID
+                });
+            }
+
+            if (vatStandard != null && environmentalFee != null)
+            {
+                context.TaxProfileTaxes.Add(new TaxProfileTax
+                {
+                    TaxProfileID = taxProfiles[2].TaxProfileID,
+                    TaxID = vatStandard.TaxID
+                });
+
+                context.TaxProfileTaxes.Add(new TaxProfileTax
+                {
+                    TaxProfileID = taxProfiles[2].TaxProfileID,
+                    TaxID = environmentalFee.TaxID
+                });
+            }
+
+            await context.SaveChangesAsync(cancellationToken);
+        }
+    }
     public class CompositeDataSeeder : IDataSeeder
     {
         private readonly IEnumerable<IDataSeeder> _seeders;

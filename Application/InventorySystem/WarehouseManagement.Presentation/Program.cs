@@ -26,8 +26,10 @@ builder.Services.AddScoped<IDataSeeder, SupplierDataSeeder>();
 builder.Services.AddScoped<IDataSeeder, ServiceDataSeeder>();
 builder.Services.AddScoped<IDataSeeder, ItemGroupDataSeeder>();
 builder.Services.AddScoped<IDataSeeder, ItemGroupItemDataSeeder>();
-
-
+builder.Services.AddScoped<IDataSeeder, ProductTaxProfileDataSeeder>();
+// Register seeders
+builder.Services.AddScoped<IDataSeeder, DefaultTaxDataSeeder>();
+builder.Services.AddScoped<IDataSeeder, TaxProfileDataSeeder>();
 // Add CompositeDataSeeder as a separate service
 builder.Services.AddScoped<CompositeDataSeeder>();
 builder.Services.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
@@ -57,6 +59,31 @@ builder.Services.AddScoped<IItemGroupsRepository, ItemGroupsRepository>();
 
 // Register services
 builder.Services.AddScoped<IItemGroupsService, ItemGroupsService>();
+// Register repositories
+builder.Services.AddScoped<IItemGroupItemsRepository, ItemGroupItemsRepository>();
+
+// Register services
+builder.Services.AddScoped<IItemGroupItemsService, ItemGroupItemsService>();
+
+// Register repositories
+builder.Services.AddScoped<IProductTaxProfilesRepository, ProductTaxProfilesRepository>();
+builder.Services.AddScoped<ITaxProfilesRepository, TaxProfilesRepository>();
+
+// Register services
+builder.Services.AddScoped<IProductTaxProfilesService, ProductTaxProfilesService>();
+
+
+
+// Register repositories
+builder.Services.AddScoped<IDefaultTaxesRepository, DefaultTaxesRepository>();
+builder.Services.AddScoped<ITaxProfilesRepository, TaxProfilesRepository>();
+builder.Services.AddScoped<ITaxProfileTaxesRepository, TaxProfileTaxesRepository>();
+
+// Register services
+builder.Services.AddScoped<IDefaultTaxesService, DefaultTaxesService>();
+builder.Services.AddScoped<ITaxProfilesService, TaxProfilesService>();
+
+
 
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>

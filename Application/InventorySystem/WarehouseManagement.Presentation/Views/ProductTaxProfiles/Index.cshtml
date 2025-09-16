@@ -1,0 +1,72 @@
+﻿@using WarehouseManagement.Core.ViewModels
+@model IEnumerable<ProductTaxProfileViewModel>
+
+<div class="container mt-4">
+    <h2>Product Tax Profiles</h2>
+
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <input name="search" type="text" class="form-control" placeholder="Search by product or tax profile..."
+                   value="@Context.Request.Query["search"]">
+        </div>
+        <div class="col-md-3">
+            <select name="productId" class="form-select" asp-items="ViewBag.Products">
+                <option value="">All Products</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="taxProfileId" class="form-select" asp-items="ViewBag.TaxProfiles">
+                <option value="">All Tax Profiles</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+    </form>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Tax Profile</th>
+                <th>Tax Rate</th>
+                <th>Primary</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var profile in Model)
+            {
+                <tr>
+                    <td>@profile.ProductName</td>
+                    <td>@profile.TaxProfileName</td>
+                    <td>@profile.TaxRate.ToString("P")</td>
+                    <td>
+                        @if (profile.IsPrimary)
+                        {
+                            <span class="badge bg-success">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">No</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-productId="@profile.ProductID" asp-route-taxProfileId="@profile.TaxProfileID"
+                           class="btn btn-sm btn-warning">Edit</a>
+                        <form asp-action="Delete" method="post" class="d-inline">
+                            <input type="hidden" name="productId" value="@profile.ProductID" />
+                            <input type="hidden" name="taxProfileId" value="@profile.TaxProfileID" />
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Are you sure you want to delete this tax profile assignment?')">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a asp-action="Create" class="btn btn-success">Create New</a>
+</div>
