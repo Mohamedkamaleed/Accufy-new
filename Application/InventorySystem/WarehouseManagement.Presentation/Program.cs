@@ -53,6 +53,9 @@ builder.Services.AddScoped<ISuppliersService, SuppliersService>();
 builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
 builder.Services.AddScoped<IProductsService, ProductsService>();
 
+builder.Services.AddScoped<IServicesRepository, ServicesRepository>();
+builder.Services.AddScoped<IServicesService, ServicesService>();
+
 
 builder.Services.AddScoped<IItemGroupsRepository, ItemGroupsRepository>();
 builder.Services.AddScoped<IItemGroupsService, ItemGroupsService>();
