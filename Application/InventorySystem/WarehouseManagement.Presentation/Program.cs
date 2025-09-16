@@ -27,9 +27,10 @@ builder.Services.AddScoped<IDataSeeder, ServiceDataSeeder>();
 builder.Services.AddScoped<IDataSeeder, ItemGroupDataSeeder>();
 builder.Services.AddScoped<IDataSeeder, ItemGroupItemDataSeeder>();
 builder.Services.AddScoped<IDataSeeder, ProductTaxProfileDataSeeder>();
-// Register seeders
 builder.Services.AddScoped<IDataSeeder, DefaultTaxDataSeeder>();
 builder.Services.AddScoped<IDataSeeder, TaxProfileDataSeeder>();
+builder.Services.AddScoped<IDataSeeder, ProductDataSeeder>(); 
+
 // Add CompositeDataSeeder as a separate service
 builder.Services.AddScoped<CompositeDataSeeder>();
 builder.Services.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
@@ -49,27 +50,18 @@ builder.Services.AddScoped<IBrandsService, BrandsService>();
 builder.Services.AddScoped<ISuppliersRepository, SuppliersRepository>();
 builder.Services.AddScoped<ISuppliersService, SuppliersService>();
 
-// Register repositories
 builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
-
-// Register services
 builder.Services.AddScoped<IProductsService, ProductsService>();
-// Register repositories
+
+
 builder.Services.AddScoped<IItemGroupsRepository, ItemGroupsRepository>();
-
-// Register services
 builder.Services.AddScoped<IItemGroupsService, ItemGroupsService>();
-// Register repositories
-builder.Services.AddScoped<IItemGroupItemsRepository, ItemGroupItemsRepository>();
 
-// Register services
+builder.Services.AddScoped<IItemGroupItemsRepository, ItemGroupItemsRepository>();
 builder.Services.AddScoped<IItemGroupItemsService, ItemGroupItemsService>();
 
-// Register repositories
 builder.Services.AddScoped<IProductTaxProfilesRepository, ProductTaxProfilesRepository>();
 builder.Services.AddScoped<ITaxProfilesRepository, TaxProfilesRepository>();
-
-// Register services
 builder.Services.AddScoped<IProductTaxProfilesService, ProductTaxProfilesService>();
 
 

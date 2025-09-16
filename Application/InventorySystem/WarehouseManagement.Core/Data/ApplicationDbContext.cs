@@ -28,6 +28,24 @@ namespace WarehouseManagement.Core.Data
         {
             base.OnModelCreating(modelBuilder);
 
+
+
+            // Configure all entities with CreatedAt to use CURRENT_TIMESTAMP
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                var createdAtProperty = entityType.FindProperty("CreatedAt");
+                if (createdAtProperty != null && createdAtProperty.ClrType == typeof(DateTime))
+                {
+                    createdAtProperty.SetDefaultValueSql("CURRENT_TIMESTAMP");
+                }
+
+                var createdDateProperty = entityType.FindProperty("CreatedDate");
+                if (createdDateProperty != null && createdDateProperty.ClrType == typeof(DateTime))
+                {
+                    createdDateProperty.SetDefaultValueSql("CURRENT_TIMESTAMP");
+                }
+            }
+
             // Product configuration
             modelBuilder.Entity<Product>(entity =>
             {

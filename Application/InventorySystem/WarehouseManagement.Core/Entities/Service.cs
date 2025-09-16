@@ -5,8 +5,6 @@ namespace WarehouseManagement.Core.Entities
 {
     public class Service
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ServiceID { get; set; }
 
         [Required]
@@ -19,7 +17,6 @@ namespace WarehouseManagement.Core.Entities
         public string? Description { get; set; }
 
         public int? CategoryID { get; set; }
-
         public int? SupplierID { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]

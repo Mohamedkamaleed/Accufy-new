@@ -618,7 +618,265 @@ namespace WarehouseManagement.Core.Data.Seeding
             await context.SaveChangesAsync(cancellationToken);
         }
     }
+    public class ProductDataSeeder : IDataSeeder
+    {
+        public async Task SeedAsync(ApplicationDbContext context, CancellationToken cancellationToken = default)
+        {
+            // Check if products already exist to avoid duplicates
+            if (await context.Products.AnyAsync(cancellationToken))
+            {
+                return; // Database has been seeded
+            }
 
+            // Get reference data
+            var categories = await context.Categories.ToListAsync(cancellationToken);
+            var brands = await context.Brands.ToListAsync(cancellationToken);
+            var suppliers = await context.Suppliers.ToListAsync(cancellationToken);
+
+            // Ensure we have the necessary reference data
+            if (!categories.Any() || !brands.Any() || !suppliers.Any())
+            {
+                Console.WriteLine("Skipping product seeding - missing reference data (categories, brands, or suppliers)");
+                return;
+            }
+
+            var productsToAdd = new List<Product>();
+
+            // Electronics products
+            var electronicsCategory = categories.FirstOrDefault(c => c.Name == "Electronics");
+            var computersCategory = categories.FirstOrDefault(c => c.Name == "Computers");
+            var smartphonesCategory = categories.FirstOrDefault(c => c.Name == "Smartphones");
+
+            var appleBrand = brands.FirstOrDefault(b => b.Name == "Apple");
+            var samsungBrand = brands.FirstOrDefault(b => b.Name == "Samsung");
+            var dellBrand = brands.FirstOrDefault(b => b.Name == "Dell");
+            var hpBrand = brands.FirstOrDefault(b => b.Name == "HP");
+            var sonyBrand = brands.FirstOrDefault(b => b.Name == "Sony");
+
+            var techSupplier = suppliers.FirstOrDefault(s => s.Name == "Tech Distributors Inc.");
+            var globalElectronics = suppliers.FirstOrDefault(s => s.Name == "Global Electronics Supply");
+            var mobileWholesalers = suppliers.FirstOrDefault(s => s.Name == "Mobile Device Wholesalers");
+
+            // Smartphones
+            if (smartphonesCategory != null && appleBrand != null && mobileWholesalers != null)
+            {
+                productsToAdd.Add(new Product
+                {
+                    Name = "iPhone 15 Pro",
+                    SKU = "IPH15PRO-256",
+                    Description = "Latest iPhone with advanced camera system",
+                    CategoryID = smartphonesCategory.CategoryID,
+                    BrandID = appleBrand.BrandID,
+                    SupplierID = mobileWholesalers.SupplierID,
+                    Barcode = "194253954305",
+                    PurchasePrice = 899.99m,
+                    SellingPrice = 1199.99m,
+                    MinPrice = 1099.99m,
+                    ProfitMargin = 25.0m,
+                    TrackStock = true,
+                    InitialStock = 50,
+                    LowStockThreshold = 5,
+                    Status = true
+                });
+
+                productsToAdd.Add(new Product
+                {
+                    Name = "iPhone 14",
+                    SKU = "IPH14-128",
+                    Description = "Previous generation iPhone",
+                    CategoryID = smartphonesCategory.CategoryID,
+                    BrandID = appleBrand.BrandID,
+                    SupplierID = mobileWholesalers.SupplierID,
+                    Barcode = "194253954306",
+                    PurchasePrice = 699.99m,
+                    SellingPrice = 899.99m,
+                    MinPrice = 799.99m,
+                    ProfitMargin = 22.0m,
+                    TrackStock = true,
+                    InitialStock = 30,
+                    LowStockThreshold = 3,
+                    Status = true
+                });
+            }
+
+            if (smartphonesCategory != null && samsungBrand != null && globalElectronics != null)
+            {
+                productsToAdd.Add(new Product
+                {
+                    Name = "Samsung Galaxy S23 Ultra",
+                    SKU = "SGS23U-512",
+                    Description = "Flagship Android smartphone with S Pen",
+                    CategoryID = smartphonesCategory.CategoryID,
+                    BrandID = samsungBrand.BrandID,
+                    SupplierID = globalElectronics.SupplierID,
+                    Barcode = "8806092712345",
+                    PurchasePrice = 949.99m,
+                    SellingPrice = 1299.99m,
+                    MinPrice = 1199.99m,
+                    ProfitMargin = 27.0m,
+                    TrackStock = true,
+                    InitialStock = 40,
+                    LowStockThreshold = 4,
+                    Status = true
+                });
+            }
+
+            // Computers and Laptops
+            if (computersCategory != null && dellBrand != null && techSupplier != null)
+            {
+                productsToAdd.Add(new Product
+                {
+                    Name = "Dell XPS 15 Laptop",
+                    SKU = "DLLXPS15-I7",
+                    Description = "Premium 15-inch business laptop",
+                    CategoryID = computersCategory.CategoryID,
+                    BrandID = dellBrand.BrandID,
+                    SupplierID = techSupplier.SupplierID,
+                    Barcode = "884116265734",
+                    PurchasePrice = 1299.99m,
+                    SellingPrice = 1799.99m,
+                    MinPrice = 1599.99m,
+                    ProfitMargin = 28.0m,
+                    TrackStock = true,
+                    InitialStock = 25,
+                    LowStockThreshold = 2,
+                    Status = true
+                });
+            }
+
+            if (computersCategory != null && hpBrand != null && techSupplier != null)
+            {
+                productsToAdd.Add(new Product
+                {
+                    Name = "HP EliteBook 840",
+                    SKU = "HPELB840-I5",
+                    Description = "Business-class 14-inch laptop",
+                    CategoryID = computersCategory.CategoryID,
+                    BrandID = hpBrand.BrandID,
+                    SupplierID = techSupplier.SupplierID,
+                    Barcode = "190780319876",
+                    PurchasePrice = 899.99m,
+                    SellingPrice = 1299.99m,
+                    MinPrice = 1149.99m,
+                    ProfitMargin = 30.0m,
+                    TrackStock = true,
+                    InitialStock = 20,
+                    LowStockThreshold = 3,
+                    Status = true
+                });
+            }
+
+            // Electronics Accessories
+            if (electronicsCategory != null && sonyBrand != null && globalElectronics != null)
+            {
+                productsToAdd.Add(new Product
+                {
+                    Name = "Sony WH-1000XM5 Headphones",
+                    SKU = "SONYWHXM5-BLK",
+                    Description = "Noise-cancelling wireless headphones",
+                    CategoryID = electronicsCategory.CategoryID,
+                    BrandID = sonyBrand.BrandID,
+                    SupplierID = globalElectronics.SupplierID,
+                    Barcode = "027242924167",
+                    PurchasePrice = 299.99m,
+                    SellingPrice = 399.99m,
+                    MinPrice = 349.99m,
+                    ProfitMargin = 25.0m,
+                    TrackStock = true,
+                    InitialStock = 35,
+                    LowStockThreshold = 5,
+                    Status = true
+                });
+            }
+
+            // Furniture products
+            var furnitureCategory = categories.FirstOrDefault(c => c.Name == "Furniture");
+            var officeChairsCategory = categories.FirstOrDefault(c => c.Name == "Office Chairs");
+
+            var ikeaBrand = brands.FirstOrDefault(b => b.Name == "IKEA");
+            var hermanMillerBrand = brands.FirstOrDefault(b => b.Name == "Herman Miller");
+            var steelcaseBrand = brands.FirstOrDefault(b => b.Name == "Steelcase");
+
+            var officeFurnitureSupplier = suppliers.FirstOrDefault(s => s.Name == "Office Furniture Solutions");
+            var homeOfficeSupplier = suppliers.FirstOrDefault(s => s.Name == "Home & Office Decor Ltd.");
+
+            // Office Chairs
+            if (officeChairsCategory != null && hermanMillerBrand != null && officeFurnitureSupplier != null)
+            {
+                productsToAdd.Add(new Product
+                {
+                    Name = "Herman Miller Aeron Chair",
+                    SKU = "HMAERON-M",
+                    Description = "Ergonomic office chair with lumbar support",
+                    CategoryID = officeChairsCategory.CategoryID,
+                    BrandID = hermanMillerBrand.BrandID,
+                    SupplierID = officeFurnitureSupplier.SupplierID,
+                    Barcode = "718756000123",
+                    PurchasePrice = 899.99m,
+                    SellingPrice = 1299.99m,
+                    MinPrice = 1149.99m,
+                    ProfitMargin = 31.0m,
+                    TrackStock = true,
+                    InitialStock = 15,
+                    LowStockThreshold = 2,
+                    Status = true
+                });
+            }
+
+            if (officeChairsCategory != null && steelcaseBrand != null && officeFurnitureSupplier != null)
+            {
+                productsToAdd.Add(new Product
+                {
+                    Name = "Steelcase Gesture Chair",
+                    SKU = "SCGESTURE-BLK",
+                    Description = "Modern ergonomic office chair",
+                    CategoryID = officeChairsCategory.CategoryID,
+                    BrandID = steelcaseBrand.BrandID,
+                    SupplierID = officeFurnitureSupplier.SupplierID,
+                    Barcode = "840119112345",
+                    PurchasePrice = 799.99m,
+                    SellingPrice = 1199.99m,
+                    MinPrice = 1049.99m,
+                    ProfitMargin = 33.0m,
+                    TrackStock = true,
+                    InitialStock = 12,
+                    LowStockThreshold = 2,
+                    Status = true
+                });
+            }
+
+            if (officeChairsCategory != null && ikeaBrand != null && homeOfficeSupplier != null)
+            {
+                productsToAdd.Add(new Product
+                {
+                    Name = "IKEA Markus Office Chair",
+                    SKU = "IKMARKUS-GRY",
+                    Description = "Affordable office chair with good support",
+                    CategoryID = officeChairsCategory.CategoryID,
+                    BrandID = ikeaBrand.BrandID,
+                    SupplierID = homeOfficeSupplier.SupplierID,
+                    Barcode = "903884123456",
+                    PurchasePrice = 149.99m,
+                    SellingPrice = 199.99m,
+                    MinPrice = 179.99m,
+                    ProfitMargin = 25.0m,
+                    TrackStock = true,
+                    InitialStock = 40,
+                    LowStockThreshold = 8,
+                    Status = true
+                });
+            }
+
+            // Add products to context and save
+            if (productsToAdd.Any())
+            {
+                await context.Products.AddRangeAsync(productsToAdd, cancellationToken);
+                await context.SaveChangesAsync(cancellationToken);
+
+                Console.WriteLine($"Successfully seeded {productsToAdd.Count} products");
+            }
+        }
+    }
 
     //public class DefaultTaxDataSeeder : IDataSeeder
     //{
