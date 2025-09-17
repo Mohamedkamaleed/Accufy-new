@@ -11,17 +11,31 @@ namespace WarehouseManagement.Presentation.Controllers
         private readonly ICategoryService _categoriesService;
         private readonly IBrandsService _brandsService;
         private readonly ISuppliersService _suppliersService;
+        private readonly IStockTransactionsService _stockTransactionsService;
+        private readonly IActivityLogService _activityLogService;
+        private readonly IItemGroupsService _itemGroupsService;
+        private readonly IWarehouseService _warehouseService;
+
+
 
         public ProductsController(
             IProductsService productsService,
             ICategoryService categoriesService,
             IBrandsService brandsService,
-            ISuppliersService suppliersService)
+            ISuppliersService suppliersService,
+            IStockTransactionsService stockTransactionsService,
+            IActivityLogService activityLogService,
+            IItemGroupsService itemGroupsService, IWarehouseService warehouseService)
         {
             _productsService = productsService;
             _categoriesService = categoriesService;
             _brandsService = brandsService;
             _suppliersService = suppliersService;
+            _stockTransactionsService = stockTransactionsService;
+            _activityLogService = activityLogService;
+            _itemGroupsService = itemGroupsService;
+            _warehouseService = warehouseService;
+
         }
 
         [HttpGet]
@@ -56,7 +70,7 @@ namespace WarehouseManagement.Presentation.Controllers
                     BrandID = p.BrandID,
                     BrandName = p.Brand.Name,
                     SupplierID = p.SupplierID,
-                    SupplierName = p.Supplier.Name,
+                    SupplierName = p.Supplier.BusinessName,
                     Barcode = p.Barcode,
                     PurchasePrice = p.PurchasePrice,
                     SellingPrice = p.SellingPrice,
@@ -176,5 +190,111 @@ namespace WarehouseManagement.Presentation.Controllers
             ViewBag.Brands = new SelectList(await _brandsService.GetAllBrandsAsync(), "BrandID", "Name");
             ViewBag.Suppliers = new SelectList(await _suppliersService.GetAllSuppliersAsync(), "SupplierID", "Name");
         }
+
+
+
+        // GET: Products/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            var product = await _productsService.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new ProductDetailViewModel
+            {
+                ProductID = product.ProductID,
+                Name = product.Name,
+                SKU = product.SKU,
+                Description = product.Description,
+                CategoryID = product.CategoryID,
+                CategoryName = product.Category?.Name ?? "N/A",
+                BrandID = product.BrandID,
+                BrandName = product.Brand?.Name,
+                SupplierID = product.SupplierID,
+                SupplierName = product.Supplier?.BusinessName,
+                Barcode = product.Barcode,
+                PurchasePrice = product.PurchasePrice,
+                SellingPrice = product.SellingPrice,
+                MinPrice = product.MinPrice,
+                Discount = product.Discount,
+                DiscountType = product.DiscountType,
+                ProfitMargin = product.ProfitMargin,
+                TrackStock = product.TrackStock,
+                InitialStock = product.InitialStock,
+                LowStockThreshold = product.LowStockThreshold,
+                Status = product.Status,
+                GroupID = product.GroupID,
+                GroupName = product.ItemGroup?.Name,
+                CreatedAt = product.CreatedAt,
+                UpdatedAt = product.UpdatedAt,
+
+                // Calculate summary metrics
+                OnHandStock = await _stockTransactionsService.GetCurrentStockAsync(id),
+                TotalSold = await _stockTransactionsService.GetTotalSoldAsync(id),
+                SalesLast28Days = await _stockTransactionsService.GetSalesAmountAsync(id, DateTime.UtcNow.AddDays(-28), DateTime.UtcNow),
+                SalesLast7Days = await _stockTransactionsService.GetSalesAmountAsync(id, DateTime.UtcNow.AddDays(-7), DateTime.UtcNow),
+                AverageUnitCost = await _stockTransactionsService.GetAverageUnitCostAsync(id),
+                StockStatus = await _stockTransactionsService.GetCurrentStockAsync(id) > 0 ? "In Stock" : "Out of Stock"
+            };
+
+            // Load tab data
+            viewModel.StockTransactions = await _stockTransactionsService.GetTransactionsByProductAsync(id);
+            viewModel.TimelineEvents = await _activityLogService.GetTimelineEventsAsync(id);
+            viewModel.ActivityLogs = await _activityLogService.GetActivityLogsAsync(id);
+
+            if (product.GroupID.HasValue)
+            {
+                viewModel.ItemGroup = await _itemGroupsService.GetItemGroupViewModelAsync(product.GroupID.Value);
+            }
+
+            return View(viewModel);
+        }
+
+        // GET: Products/CreateStockTransaction/5
+        public async Task<IActionResult> CreateStockTransaction(int id)
+        {
+            var product = await _productsService.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new StockTransactionCreateViewModel
+            {
+                ProductID = id,
+                ProductName = product.Name,
+                TransactionDate = DateTime.Now
+            };
+
+            ViewBag.Warehouses = await _warehouseService.GetAllWarehousesAsync();
+            ViewBag.TransactionTypes = new List<string> { "Purchase", "Sale", "Adjustment", "Transfer" };
+
+            return View(viewModel);
+        }
+
+        // POST: Products/CreateStockTransaction
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateStockTransaction(StockTransactionCreateViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _stockTransactionsService.CreateTransactionAsync(model);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction(nameof(Details), new { id = model.ProductID });
+                }
+
+                ModelState.AddModelError("", result.Error);
+            }
+
+            ViewBag.Warehouses = await _warehouseService.GetAllWarehousesAsync();
+            ViewBag.TransactionTypes = new List<string> { "Purchase", "Sale", "Adjustment", "Transfer" };
+
+            return View(model);
+        }
+
     }
 }

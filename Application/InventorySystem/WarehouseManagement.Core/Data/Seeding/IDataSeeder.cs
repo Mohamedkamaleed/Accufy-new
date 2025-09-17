@@ -220,7 +220,7 @@ namespace WarehouseManagement.Core.Data.Seeding
         {
             // Check if specific suppliers already exist by name to avoid duplicates
             var existingSuppliers = await context.Suppliers
-                .Select(s => s.Name)
+                .Select(s => s.BusinessName)
                 .ToListAsync(cancellationToken);
 
             var suppliersToAdd = new List<Supplier>();
@@ -228,49 +228,49 @@ namespace WarehouseManagement.Core.Data.Seeding
             // Add electronics suppliers
             if (!existingSuppliers.Contains("Tech Distributors Inc."))
             {
-                suppliersToAdd.Add(new Supplier { Name = "Tech Distributors Inc." });
+                suppliersToAdd.Add(new Supplier { BusinessName = "Tech Distributors Inc." });
             }
 
             if (!existingSuppliers.Contains("Global Electronics Supply"))
             {
-                suppliersToAdd.Add(new Supplier { Name = "Global Electronics Supply" });
+                suppliersToAdd.Add(new Supplier { BusinessName = "Global Electronics Supply" });
             }
 
             if (!existingSuppliers.Contains("Mobile Device Wholesalers"))
             {
-                suppliersToAdd.Add(new Supplier { Name = "Mobile Device Wholesalers" });
+                suppliersToAdd.Add(new Supplier { BusinessName = "Mobile Device Wholesalers" });
             }
 
             if (!existingSuppliers.Contains("Computer Parts Unlimited"))
             {
-                suppliersToAdd.Add(new Supplier { Name = "Computer Parts Unlimited" });
+                suppliersToAdd.Add(new Supplier { BusinessName = "Computer Parts Unlimited" });
             }
 
             // Add furniture suppliers
             if (!existingSuppliers.Contains("Office Furniture Solutions"))
             {
-                suppliersToAdd.Add(new Supplier { Name = "Office Furniture Solutions" });
+                suppliersToAdd.Add(new Supplier { BusinessName = "Office Furniture Solutions" });
             }
 
             if (!existingSuppliers.Contains("Home & Office Decor Ltd."))
             {
-                suppliersToAdd.Add(new Supplier { Name = "Home & Office Decor Ltd." });
+                suppliersToAdd.Add(new Supplier { BusinessName = "Home & Office Decor Ltd." });
             }
 
             if (!existingSuppliers.Contains("Ergonomic Workspace Suppliers"))
             {
-                suppliersToAdd.Add(new Supplier { Name = "Ergonomic Workspace Suppliers" });
+                suppliersToAdd.Add(new Supplier { BusinessName = "Ergonomic Workspace Suppliers" });
             }
 
             // Add general suppliers
             if (!existingSuppliers.Contains("General Wholesale Distributors"))
             {
-                suppliersToAdd.Add(new Supplier { Name = "General Wholesale Distributors" });
+                suppliersToAdd.Add(new Supplier { BusinessName = "General Wholesale Distributors" });
             }
 
             if (!existingSuppliers.Contains("Regional Supply Chain Partners"))
             {
-                suppliersToAdd.Add(new Supplier { Name = "Regional Supply Chain Partners" });
+                suppliersToAdd.Add(new Supplier { BusinessName = "Regional Supply Chain Partners" });
             }
 
             if (suppliersToAdd.Any())
@@ -297,8 +297,8 @@ namespace WarehouseManagement.Core.Data.Seeding
 
             var electronicsCategory = categories.FirstOrDefault(c => c.Name == "Electronics");
             var furnitureCategory = categories.FirstOrDefault(c => c.Name == "Furniture");
-            var techSupplier = suppliers.FirstOrDefault(s => s.Name.Contains("Tech"));
-            var furnitureSupplier = suppliers.FirstOrDefault(s => s.Name.Contains("Furniture"));
+            var techSupplier = suppliers.FirstOrDefault(s => s.BusinessName.Contains("Tech"));
+            var furnitureSupplier = suppliers.FirstOrDefault(s => s.BusinessName.Contains("Furniture"));
 
             var services = new List<Service>
         {
@@ -653,9 +653,9 @@ namespace WarehouseManagement.Core.Data.Seeding
             var hpBrand = brands.FirstOrDefault(b => b.Name == "HP");
             var sonyBrand = brands.FirstOrDefault(b => b.Name == "Sony");
 
-            var techSupplier = suppliers.FirstOrDefault(s => s.Name == "Tech Distributors Inc.");
-            var globalElectronics = suppliers.FirstOrDefault(s => s.Name == "Global Electronics Supply");
-            var mobileWholesalers = suppliers.FirstOrDefault(s => s.Name == "Mobile Device Wholesalers");
+            var techSupplier = suppliers.FirstOrDefault(s => s.BusinessName == "Tech Distributors Inc.");
+            var globalElectronics = suppliers.FirstOrDefault(s => s.BusinessName == "Global Electronics Supply");
+            var mobileWholesalers = suppliers.FirstOrDefault(s => s.BusinessName == "Mobile Device Wholesalers");
 
             // Smartphones
             if (smartphonesCategory != null && appleBrand != null && mobileWholesalers != null)
@@ -797,8 +797,8 @@ namespace WarehouseManagement.Core.Data.Seeding
             var hermanMillerBrand = brands.FirstOrDefault(b => b.Name == "Herman Miller");
             var steelcaseBrand = brands.FirstOrDefault(b => b.Name == "Steelcase");
 
-            var officeFurnitureSupplier = suppliers.FirstOrDefault(s => s.Name == "Office Furniture Solutions");
-            var homeOfficeSupplier = suppliers.FirstOrDefault(s => s.Name == "Home & Office Decor Ltd.");
+            var officeFurnitureSupplier = suppliers.FirstOrDefault(s => s.BusinessName == "Office Furniture Solutions");
+            var homeOfficeSupplier = suppliers.FirstOrDefault(s => s.BusinessName == "Home & Office Decor Ltd.");
 
             // Office Chairs
             if (officeChairsCategory != null && hermanMillerBrand != null && officeFurnitureSupplier != null)

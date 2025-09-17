@@ -224,6 +224,48 @@ CREATE TABLE ProductWarehouses (
 );
 
 
+-- StockTransactions Table
+CREATE TABLE StockTransactions (
+    TransactionID INT PRIMARY KEY IDENTITY,
+    ProductID INT NOT NULL,
+    WarehouseID INT NOT NULL,
+    TransactionDate DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    TransactionType NVARCHAR(20) NOT NULL,
+    Quantity DECIMAL(18,2) NOT NULL,
+    UnitPrice DECIMAL(18,2) NOT NULL,
+    StockLevelAfter DECIMAL(18,2) NOT NULL,
+    Reference NVARCHAR(100),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID),
+    FOREIGN KEY (WarehouseID) REFERENCES Warehouses(Id)
+);
+
+-- TimelineEvents Table
+CREATE TABLE TimelineEvents (
+    EventID INT PRIMARY KEY IDENTITY,
+    ProductID INT NOT NULL,
+    ActionType NVARCHAR(50) NOT NULL,
+    ItemReference NVARCHAR(100),
+    UserID NVARCHAR(450) NOT NULL,
+    Timestamp DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    StockBalance DECIMAL(18,2) NOT NULL,
+    AveragePrice DECIMAL(18,2) NOT NULL,
+    Description NVARCHAR(500) NOT NULL,
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+-- ActivityLogs Table
+CREATE TABLE ActivityLogs (
+    LogID INT PRIMARY KEY IDENTITY,
+    ProductID INT NOT NULL,
+    ActionType NVARCHAR(50) NOT NULL,
+    UserID NVARCHAR(450) NOT NULL,
+    Timestamp DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    BeforeValue NVARCHAR(MAX),
+    AfterValue NVARCHAR(MAX),
+    Details NVARCHAR(500),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
 -- Insert into Categories
 INSERT INTO Categories (Name, Description, ParentCategoryID) VALUES ('Category 1', 'Description 1', NULL);
 INSERT INTO Categories (Name, Description, ParentCategoryID) VALUES ('Category 2', 'Description 2', NULL);
