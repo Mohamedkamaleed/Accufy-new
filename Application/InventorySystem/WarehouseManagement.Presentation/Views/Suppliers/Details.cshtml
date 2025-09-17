@@ -1,0 +1,202 @@
+﻿@model WarehouseManagement.Core.ViewModels.SupplierDetailViewModel
+
+@{
+    ViewData["Title"] = "Supplier Details";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>Supplier Details</h2>
+        </div>
+        <div class="col-md-6 text-end">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5>@Model.BusinessName</h5>
+                <div>
+                    <span class="badge @(Model.IsActive ? "bg-success" : "bg-secondary")">
+                        @(Model.IsActive ? "Active" : "Inactive")
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-sm">
+                        <tr>
+                            <th>Supplier Number:</th>
+                            <td>@Model.SupplierNumber</td>
+                        </tr>
+                        <tr>
+                            <th>Contact Name:</th>
+                            <td>@($"{Model.FirstName} {Model.LastName}")</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>@Model.Email</td>
+                        </tr>
+                        <tr>
+                            <th>Phone:</th>
+                            <td>@Model.Telephone</td>
+                        </tr>
+                        <tr>
+                            <th>Mobile:</th>
+                            <td>@Model.Mobile</td>
+                        </tr>
+                        <tr>
+                            <th>Currency:</th>
+                            <td>@Model.Currency</td>
+                        </tr>
+                        <tr>
+                            <th>Opening Balance:</th>
+                            <td>@Model.OpeningBalance.ToString("C")</td>
+                        </tr>
+                        <tr>
+                            <th>Opening Balance Date:</th>
+                            <td>@Model.OpeningBalanceDate?.ToString("yyyy-MM-dd")</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-sm">
+                        <tr>
+                            <th>Commercial Registration:</th>
+                            <td>@Model.CommercialRegistration</td>
+                        </tr>
+                        <tr>
+                            <th>Tax ID:</th>
+                            <td>@Model.TaxID</td>
+                        </tr>
+                        <tr>
+                            <th>Address:</th>
+                            <td>
+                                @Model.StreetAddress1<br />
+                                @if (!string.IsNullOrEmpty(Model.StreetAddress2))
+                                {
+                                    @Model.StreetAddress2
+                                
+                                    <br />
+                                }
+                                @Model.City, @Model.State @Model.PostalCode<br />
+                                @Model.Country
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Created:</th>
+                            <td>@Model.CreatedAt.ToString("yyyy-MM-dd") by @Model.CreatedBy</td>
+                        </tr>
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <tr>
+                                <th>Last Updated:</th>
+                                <td>@Model.UpdatedAt.Value.ToString("yyyy-MM-dd") by @Model.UpdatedBy</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Notes))
+            {
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <h6>Notes:</h6>
+                        <p>@Model.Notes</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (Model.Contacts.Any())
+    {
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Contact Persons</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Primary</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var contact in Model.Contacts)
+                            {
+                                <tr>
+                                    <td>@contact.Name</td>
+                                    <td>@contact.Position</td>
+                                    <td>@contact.Phone</td>
+                                    <td>@contact.Email</td>
+                                    <td>
+                                        @if (contact.IsPrimary)
+                                        {
+                                            <span class="badge bg-success">Yes</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">No</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (Model.Attachments.Any())
+    {
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Attachments</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Description</th>
+                                <th>Uploaded</th>
+                                <th>Uploaded By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var attachment in Model.Attachments)
+                            {
+                                <tr>
+                                    <td>@attachment.FileName</td>
+                                    <td>@attachment.Description</td>
+                                    <td>@attachment.UploadedAt.ToString("yyyy-MM-dd")</td>
+                                    <td>@attachment.UploadedBy</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model.SupplierID" class="btn btn-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>

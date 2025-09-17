@@ -4,29 +4,287 @@
     ViewData["Title"] = "Create Supplier";
 }
 
-<h2>Create Supplier</h2>
-
-<form asp-action="Create" method="post">
-    @Html.AntiForgeryToken()
-
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>Create New Supplier</h2>
+        </div>
+        <div class="col-md-6 text-end">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label asp-for="Description"></label>
-        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
 
-    <button type="submit" class="btn btn-primary">Create</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+        <div class="card">
+            <div class="card-header">
+                <h5>Supplier Information</h5>
+            </div>
+            <div class="card-body">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="BusinessName" class="control-label"></label>
+                            <input asp-for="BusinessName" class="form-control" />
+                            <span asp-validation-for="BusinessName" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="FirstName" class="control-label"></label>
+                                    <input asp-for="FirstName" class="form-control" />
+                                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="LastName" class="control-label"></label>
+                                    <input asp-for="LastName" class="form-control" />
+                                    <span asp-validation-for="LastName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Telephone" class="control-label"></label>
+                                    <input asp-for="Telephone" class="form-control" />
+                                    <span asp-validation-for="Telephone" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Mobile" class="control-label"></label>
+                                    <input asp-for="Mobile" class="form-control" />
+                                    <span asp-validation-for="Mobile" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Email" class="control-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Currency" class="control-label"></label>
+                            <select asp-for="Currency" class="form-select" asp-items="ViewBag.Currencies">
+                                <option value="">Select Currency</option>
+                            </select>
+                            <span asp-validation-for="Currency" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="OpeningBalance" class="control-label"></label>
+                                    <input asp-for="OpeningBalance" class="form-control" />
+                                    <span asp-validation-for="OpeningBalance" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="OpeningBalanceDate" class="control-label"></label>
+                                    <input asp-for="OpeningBalanceDate" type="date" class="form-control" />
+                                    <span asp-validation-for="OpeningBalanceDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="CommercialRegistration" class="control-label"></label>
+                            <input asp-for="CommercialRegistration" class="form-control" />
+                            <span asp-validation-for="CommercialRegistration" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="TaxID" class="control-label"></label>
+                            <input asp-for="TaxID" class="form-control" />
+                            <span asp-validation-for="TaxID" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Address Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="StreetAddress1" class="control-label"></label>
+                            <input asp-for="StreetAddress1" class="form-control" />
+                            <span asp-validation-for="StreetAddress1" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="StreetAddress2" class="control-label"></label>
+                            <input asp-for="StreetAddress2" class="form-control" />
+                            <span asp-validation-for="StreetAddress2" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label asp-for="City" class="control-label"></label>
+                            <input asp-for="City" class="form-control" />
+                            <span asp-validation-for="City" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label asp-for="State" class="control-label"></label>
+                            <input asp-for="State" class="form-control" />
+                            <span asp-validation-for="State" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label asp-for="PostalCode" class="control-label"></label>
+                            <input asp-for="PostalCode" class="form-control" />
+                            <span asp-validation-for="PostalCode" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Country" class="control-label"></label>
+                    <input asp-for="Country" class="form-control" />
+                    <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Contact Persons</h5>
+                <button type="button" id="add-contact" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus"></i> Add Contact
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="contacts-container">
+                    @for (int i = 0; i < Model.Contacts.Count; i++)
+                    {
+                        <div class="contact-row card mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="Contacts[i].Name" class="control-label"></label>
+                                            <input asp-for="Contacts[i].Name" class="form-control" />
+                                            <span asp-validation-for="Contacts[i].Name" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label asp-for="Contacts[i].Phone" class="control-label"></label>
+                                            <input asp-for="Contacts[i].Phone" class="form-control" />
+                                            <span asp-validation-for="Contacts[i].Phone" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label asp-for="Contacts[i].Email" class="control-label"></label>
+                                            <input asp-for="Contacts[i].Email" class="form-control" />
+                                            <span asp-validation-for="Contacts[i].Email" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label asp-for="Contacts[i].Position" class="control-label"></label>
+                                            <input asp-for="Contacts[i].Position" class="form-control" />
+                                            <span asp-validation-for="Contacts[i].Position" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-12">
+                                        <div class="form-check">
+                                            <input asp-for="Contacts[i].IsPrimary" class="form-check-input" />
+                                            <label asp-for="Contacts[i].IsPrimary" class="form-check-label"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-12 text-end">
+                                        <button type="button" class="btn btn-danger btn-sm remove-contact">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Additional Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label asp-for="Notes" class="control-label"></label>
+                    <textarea asp-for="Notes" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Notes" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Create Supplier</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        $(document).ready(function() {
+            let contactIndex = @(Model.Contacts.Count);
+
+            // Add new contact row
+            $('#add-contact').click(function() {
+                $.ajax({
+                    url: '@Url.Action("AddContactRow", "Suppliers")',
+                    type: 'POST',
+                    data: { index: contactIndex },
+                    success: function(data) {
+                        $('#contacts-container').append(data);
+                        contactIndex++;
+                    }
+                });
+            });
+
+            // Remove contact row
+            $(document).on('click', '.remove-contact', function() {
+                $(this).closest('.contact-row').remove();
+            });
+
+            // Set primary contact (only one can be primary)
+            $(document).on('change', '.primary-contact', function() {
+                $('.primary-contact').not(this).prop('checked', false);
+            });
+        });
+    </script>
 }

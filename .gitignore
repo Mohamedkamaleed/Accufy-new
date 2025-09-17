@@ -1,2 +1,4 @@
 # Ignore Visual Studio temporary files and directories
 .vs/
+config.bat
+node_modules

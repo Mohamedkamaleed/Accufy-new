@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using WarehouseManagement.Core.Entities;
 
 namespace WarehouseManagement.Core.ViewModels
 {
@@ -41,5 +42,6 @@ namespace WarehouseManagement.Core.ViewModels
         public string? BrandName { get; set; }
         public string? Description { get; set; }
         public int ProductCount { get; set; }
+        public List<Product> Products = new List<Product>();
     }
 }

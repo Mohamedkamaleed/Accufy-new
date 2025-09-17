@@ -15,6 +15,9 @@ namespace WarehouseManagement.Core.Services
         Task<IEnumerable<ItemGroup>> GetAllItemGroupsAsync();
         Task<IEnumerable<ItemGroup>> GetItemGroupsByCategoryAsync(int categoryId);
         Task<IEnumerable<ItemGroup>> GetItemGroupsByBrandAsync(int brandId);
+
+        Task<ItemGroupViewModel> GetItemGroupViewModelAsync(int groupId);
+
     }
 
     public class ItemGroupsService : IItemGroupsService
@@ -149,6 +152,11 @@ namespace WarehouseManagement.Core.Services
         public async Task<IEnumerable<ItemGroup>> GetItemGroupsByBrandAsync(int brandId)
         {
             return await _repository.GetByBrandAsync(brandId);
+        }
+
+        public Task<ItemGroupViewModel> GetItemGroupViewModelAsync(int groupId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

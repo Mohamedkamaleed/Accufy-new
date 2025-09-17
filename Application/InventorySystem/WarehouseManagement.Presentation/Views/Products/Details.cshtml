@@ -1,0 +1,367 @@
+﻿@using WarehouseManagement.Core.ViewModels
+@model WarehouseManagement.Core.ViewModels.ProductDetailViewModel
+
+@{
+    ViewData["Title"] = "Product Details - " + Model.Name;
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>@Model.Name</h2>
+            <div class="d-flex align-items-center">
+                <span class="badge @(Model.Status ? "bg-success" : "bg-secondary") me-2">
+                    @(Model.Status ? "Active" : "Inactive")
+                </span>
+                <span class="badge @(Model.StockStatus == "In Stock" ? "bg-success" : "bg-danger")">
+                    @Model.StockStatus
+                </span>
+            </div>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group">
+                <a asp-action="Edit" asp-route-id="@Model.ProductID" class="btn btn-primary">Edit</a>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                    <span class="visually-hidden">Toggle Dropdown</span>
+                </button>
+                <div class="dropdown-menu">
+                    <a asp-action="Delete" asp-route-id="@Model.ProductID" class="dropdown-item" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                    <a asp-action="CreateStockTransaction" asp-route-id="@Model.ProductID" class="dropdown-item">Add Transaction</a>
+                    <a href="#" class="dropdown-item">Generate Voucher</a>
+                    <a asp-action="Clone" asp-route-id="@Model.ProductID" class="dropdown-item">Clone</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Panel -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">On Hand Stock</h5>
+                    <h3 class="card-text">@Model.OnHandStock</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Sold</h5>
+                    <h3 class="card-text">@Model.TotalSold</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Last 28 Days</h5>
+                    <h3 class="card-text">@Model.SalesLast28Days.ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Avg Unit Cost</h5>
+                    <h3 class="card-text">@Model.AverageUnitCost.ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Product Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>SKU:</strong> @Model.SKU</p>
+                            <p><strong>Category:</strong> @Model.CategoryName</p>
+                            <p><strong>Brand:</strong> @Model.BrandName</p>
+                            <p><strong>Supplier:</strong> @Model.SupplierName</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Purchase Price:</strong> @Model.PurchasePrice?.ToString("C")</p>
+                            <p><strong>Selling Price:</strong> @Model.SellingPrice?.ToString("C")</p>
+                            <p><strong>Barcode:</strong> @Model.Barcode</p>
+                            <p><strong>Item Group:</strong> @Model.GroupName</p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <p><strong>Description:</strong></p>
+                            <p>@Model.Description</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Product Image</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="product-image-placeholder" style="width: 100%; height: 200px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-camera fa-3x text-secondary"></i>
+                    </div>
+                    <button class="btn btn-outline-primary mt-3">Upload Image</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs" id="productTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="transactions-tab" data-bs-toggle="tab" data-bs-target="#transactions" type="button" role="tab">Stock Transactions</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="timeline-tab" data-bs-toggle="tab" data-bs-target="#timeline" type="button" role="tab">Timeline</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">Activity Log</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="group-tab" data-bs-toggle="tab" data-bs-target="#group" type="button" role="tab">Item Group</button>
+        </li>
+    </ul>
+
+    <!-- Tabs Content -->
+    <div class="tab-content p-3 border border-top-0" id="productTabsContent">
+        <!-- Stock Transactions Tab -->
+        <div class="tab-pane fade show active" id="transactions" role="tabpanel">
+            <div class="d-flex justify-content-between mb-3">
+                <h4>Stock Transactions</h4>
+                <a asp-action="CreateStockTransaction" asp-route-id="@Model.ProductID" class="btn btn-primary">Add Transaction</a>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <input type="date" class="form-control" id="startDate" placeholder="Start Date">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" class="form-control" id="endDate" placeholder="End Date">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="transactionTypeFilter">
+                        <option value="">All Types</option>
+                        <option value="Purchase">Purchase</option>
+                        <option value="Sale">Sale</option>
+                        <option value="Adjustment">Adjustment</option>
+                        <option value="Transfer">Transfer</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="warehouseFilter">
+                        <option value="">All Warehouses</option>
+                        <!-- Populate with warehouses -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Stock After</th>
+                            <th>Warehouse</th>
+                            <th>Reference</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var transaction in Model.StockTransactions)
+                        {
+                            <tr>
+                                <td>@transaction.TransactionDate.ToString("g")</td>
+                                <td><span class="badge bg-info">@transaction.TransactionType</span></td>
+                                <td class="@(transaction.Quantity > 0 ? "text-success" : "text-danger")">@(transaction.Quantity > 0 ? "+" : "")@transaction.Quantity</td>
+                                <td>@transaction.UnitPrice.ToString("C")</td>
+                                <td>@transaction.StockLevelAfter</td>
+                                <td>@transaction.WarehouseName</td>
+                                <td>@transaction.Reference</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Timeline Tab -->
+        <div class="tab-pane fade" id="timeline" role="tabpanel">
+            <h4>Timeline</h4>
+            <div class="timeline">
+                @foreach (var timelineEvent in Model.TimelineEvents)
+                {
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="d-flex justify-content-between">
+                                <h5>@timelineEvent.ActionType</h5>
+                                <small class="text-muted">@timelineEvent.Timestamp.ToString("g")</small>
+                            </div>
+                            <p>@timelineEvent.Description</p>
+                            <div class="d-flex">
+                                <span class="badge bg-light text-dark me-2">Stock: @timelineEvent.StockBalance</span>
+                                <span class="badge bg-light text-dark">Avg Price: @timelineEvent.AveragePrice.ToString("C")</span>
+                            </div>
+                            <small class="text-muted">By: @timelineEvent.UserName</small>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Activity Log Tab -->
+        <div class="tab-pane fade" id="activity" role="tabpanel">
+            <h4>Activity Log</h4>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Action</th>
+                            <th>User</th>
+                            <th>Before</th>
+                            <th>After</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var log in Model.ActivityLogs)
+                        {
+                            <tr>
+                                <td>@log.Timestamp.ToString("g")</td>
+                                <td><span class="badge bg-secondary">@log.ActionType</span></td>
+                                <td>@log.UserName</td>
+                                <td>@log.BeforeValue</td>
+                                <td>@log.AfterValue</td>
+                                <td>@log.Details</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Item Group Tab -->
+        <div class="tab-pane fade" id="group" role="tabpanel">
+            <h4>Item Group</h4>
+            @if (Model.ItemGroup != null)
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h5>@Model.ItemGroup.Name</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>SKU</th>
+                                        <th>Quantity</th>
+                                        <th>Purchase Price</th>
+                                        <th>Selling Price</th>
+                                        <th>Barcode</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in Model.ItemGroup.Products)
+                                    {
+                                        <tr>
+                                            <td>@product.Name</td>
+                                            <td>@product.SKU</td>
+                                            <td>@product.InitialStock</td>
+                                            <td>@product.PurchasePrice.ToString()</td>
+                                            <td>@product.SellingPrice.ToString()</td>
+                                            <td>@product.Barcode</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    This product is not part of any item group.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -30px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #0d6efd;
+        }
+
+        .timeline-content {
+            padding: 10px;
+            border-left: 2px solid #0d6efd;
+            margin-left: 10px;
+        }
+
+        .product-image-placeholder {
+            border: 2px dashed #dee2e6;
+            border-radius: 5px;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // Tab functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const triggerTabList = document.querySelectorAll('#productTabs button');
+            triggerTabList.forEach(triggerEl => {
+                new bootstrap.Tab(triggerEl);
+            });
+
+            // Filter functionality for transactions
+            const startDate = document.getElementById('startDate');
+            const endDate = document.getElementById('endDate');
+            const transactionTypeFilter = document.getElementById('transactionTypeFilter');
+            const warehouseFilter = document.getElementById('warehouseFilter');
+
+            [startDate, endDate, transactionTypeFilter, warehouseFilter].forEach(element => {
+                element.addEventListener('change', filterTransactions);
+            });
+
+            function filterTransactions() {
+                // Implementation for filtering transactions
+                console.log('Filtering transactions...');
+            }
+        });
+    </script>
+}
