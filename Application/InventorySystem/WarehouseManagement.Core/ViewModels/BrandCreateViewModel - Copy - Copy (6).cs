@@ -1,0 +1,4 @@
+﻿namespace WarehouseManagement.Core.ViewModels
+{
+
+}

@@ -24,6 +24,12 @@ namespace WarehouseManagement.Core.Data
         public DbSet<DefaultTax> DefaultTaxes { get; set; }
         public DbSet<TaxProfile> TaxProfiles { get; set; }
         public DbSet<TaxProfileTax> TaxProfileTaxes { get; set; }
+        public DbSet<StockTransaction> StockTransactions { get; set; }
+
+        public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
+        public DbSet<PurchaseOrderLine> PurchaseOrderLines { get; set; }
+        public DbSet<PurchaseOrderAttachment> PurchaseOrderAttachments { get; set; }
+        public DbSet<PurchaseOrderStatusHistory> PurchaseOrderStatusHistory { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -379,6 +385,217 @@ namespace WarehouseManagement.Core.Data
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
+
+
+            // StockTransaction configuration
+            modelBuilder.Entity<StockTransaction>(entity =>
+            {
+                entity.ToTable("StockTransactions");
+                entity.HasKey(st => st.TransactionID);
+
+                entity.Property(st => st.TransactionDate)
+                    .IsRequired()
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(st => st.TransactionType)
+                    .IsRequired()
+                    .HasConversion<string>()
+                    .HasMaxLength(20);
+
+                entity.Property(st => st.Quantity)
+                    .IsRequired()
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(st => st.UnitPrice)
+                    .IsRequired()
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(st => st.StockLevelAfter)
+                    .IsRequired()
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(st => st.Reference)
+                    .HasMaxLength(100);
+
+                entity.Property(st => st.CreatedBy)
+                    .IsRequired()
+                    .HasMaxLength(450);
+
+                // Relationships
+                entity.HasOne(st => st.Product)
+                    .WithMany(p => p.StockTransactions)
+                    .HasForeignKey(st => st.ProductID)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(st => st.Warehouse)
+                    .WithMany()
+                    .HasForeignKey(st => st.WarehouseID)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Indexes for better query performance
+                entity.HasIndex(st => st.TransactionDate);
+                entity.HasIndex(st => st.ProductID);
+                entity.HasIndex(st => st.WarehouseID);
+                entity.HasIndex(st => st.TransactionType);
+            });
+
+            // PurchaseOrder configuration
+            modelBuilder.Entity<PurchaseOrder>(entity =>
+            {
+                entity.ToTable("PurchaseOrders");
+                entity.HasKey(po => po.PurchaseOrderID);
+
+                entity.Property(po => po.OrderNumber)
+                    .IsRequired()
+                    .HasMaxLength(20);
+
+                entity.Property(po => po.ReferenceNumber)
+                    .HasMaxLength(50);
+
+                entity.Property(po => po.ShippingAddress)
+                    .HasMaxLength(500);
+
+                entity.Property(po => po.BillingAddress)
+                    .HasMaxLength(500);
+
+                entity.Property(po => po.SubTotal)
+                    .HasColumnType("decimal(18,2)")
+                    .HasDefaultValue(0);
+
+                entity.Property(po => po.TaxAmount)
+                    .HasColumnType("decimal(18,2)")
+                    .HasDefaultValue(0);
+
+                entity.Property(po => po.DiscountAmount)
+                    .HasColumnType("decimal(18,2)")
+                    .HasDefaultValue(0);
+
+                entity.Property(po => po.ShippingCost)
+                    .HasColumnType("decimal(18,2)")
+                    .HasDefaultValue(0);
+
+                entity.Property(po => po.TotalAmount)
+                    .HasColumnType("decimal(18,2)")
+                    .HasDefaultValue(0);
+
+                entity.Property(po => po.Notes)
+                    .HasMaxLength(1000);
+
+                entity.Property(po => po.TermsAndConditions)
+                    .HasMaxLength(1000);
+
+                entity.Property(po => po.CreatedBy)
+                    .IsRequired()
+                    .HasMaxLength(450);
+
+                entity.Property(po => po.UpdatedBy)
+                    .HasMaxLength(450);
+
+                entity.HasIndex(po => po.OrderNumber)
+                    .IsUnique();
+
+                entity.HasOne(po => po.Supplier)
+                    .WithMany(s => s.PurchaseOrders)
+                    .HasForeignKey(po => po.SupplierID)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // PurchaseOrderLine configuration
+            modelBuilder.Entity<PurchaseOrderLine>(entity =>
+            {
+                entity.ToTable("PurchaseOrderLines");
+                entity.HasKey(pol => pol.PurchaseOrderLineID);
+
+                entity.Property(pol => pol.ProductName)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(pol => pol.ProductSKU)
+                    .HasMaxLength(100);
+
+                entity.Property(pol => pol.Quantity)
+                    .HasColumnType("decimal(18,2)")
+                    .HasDefaultValue(0);
+
+                entity.Property(pol => pol.UnitPrice)
+                    .HasColumnType("decimal(18,2)")
+                    .HasDefaultValue(0);
+
+                entity.Property(pol => pol.DiscountPercentage)
+                    .HasColumnType("decimal(18,2)")
+                    .HasDefaultValue(0);
+
+                entity.Property(pol => pol.TaxPercentage)
+                    .HasColumnType("decimal(18,2)")
+                    .HasDefaultValue(0);
+
+                entity.Property(pol => pol.LineTotal)
+                    .HasColumnType("decimal(18,2)")
+                    .HasDefaultValue(0);
+
+                entity.Property(pol => pol.ReceivedQuantity)
+                    .HasColumnType("decimal(18,2)")
+                    .HasDefaultValue(0);
+
+                entity.Property(pol => pol.Notes)
+                    .HasMaxLength(500);
+
+                entity.HasOne(pol => pol.PurchaseOrder)
+                    .WithMany(po => po.OrderLines)
+                    .HasForeignKey(pol => pol.PurchaseOrderID)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(pol => pol.Product)
+                    .WithMany()
+                    .HasForeignKey(pol => pol.ProductID)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // PurchaseOrderAttachment configuration
+            modelBuilder.Entity<PurchaseOrderAttachment>(entity =>
+            {
+                entity.ToTable("PurchaseOrderAttachments");
+                entity.HasKey(poa => poa.AttachmentID);
+
+                entity.Property(poa => poa.FileName)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(poa => poa.FileType)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(poa => poa.Description)
+                    .HasMaxLength(500);
+
+                entity.Property(poa => poa.UploadedBy)
+                    .IsRequired()
+                    .HasMaxLength(450);
+
+                entity.HasOne(poa => poa.PurchaseOrder)
+                    .WithMany(po => po.Attachments)
+                    .HasForeignKey(poa => poa.PurchaseOrderID)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // PurchaseOrderStatusHistory configuration
+            modelBuilder.Entity<PurchaseOrderStatusHistory>(entity =>
+            {
+                entity.ToTable("PurchaseOrderStatusHistory");
+                entity.HasKey(posh => posh.StatusHistoryID);
+
+                entity.Property(posh => posh.Notes)
+                    .HasMaxLength(500);
+
+                entity.Property(posh => posh.ChangedBy)
+                    .IsRequired()
+                    .HasMaxLength(450);
+
+                entity.HasOne(posh => posh.PurchaseOrder)
+                    .WithMany(po => po.StatusHistory)
+                    .HasForeignKey(posh => posh.PurchaseOrderID)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
             // Apply all configurations from the current assembly
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }

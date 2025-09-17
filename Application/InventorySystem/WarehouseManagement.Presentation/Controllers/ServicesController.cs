@@ -51,7 +51,7 @@ namespace WarehouseManagement.Presentation.Controllers
                     CategoryID = s.CategoryID,
                     CategoryName = s.Category.Name,
                     SupplierID = s.SupplierID,
-                    SupplierName = s.Supplier.Name,
+                    SupplierName = s.Supplier.BusinessName,
                     PurchasePrice = s.PurchasePrice,
                     UnitPrice = s.UnitPrice,
                     MinPrice = s.MinPrice,

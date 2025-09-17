@@ -73,5 +73,6 @@ namespace WarehouseManagement.Core.Entities
 
 
         public ICollection<ProductTaxProfile> ProductTaxProfiles { get; set; } = new List<ProductTaxProfile>();
+        public ICollection<StockTransaction> StockTransactions { get; set; } = new List<StockTransaction>();
     }
 }

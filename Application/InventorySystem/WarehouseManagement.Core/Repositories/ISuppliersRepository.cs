@@ -8,11 +8,16 @@ namespace WarehouseManagement.Core.Repositories
     {
         Task<IEnumerable<Supplier>> GetAllAsync();
         Task<Supplier?> GetByIdAsync(int id);
-        Task<Supplier?> GetByNameAsync(string name);
+        Task<Supplier?> GetByIdWithDetailsAsync(int id);
+        Task<Supplier?> GetByBusinessNameAsync(string businessName);
+        Task<Supplier?> GetBySupplierNumberAsync(string supplierNumber);
+        Task<Supplier?> GetLastSupplierAsync();
+        Task<IEnumerable<Supplier>> SearchAsync(string searchTerm);
         Task AddAsync(Supplier supplier);
         Task UpdateAsync(Supplier supplier);
         Task DeleteAsync(Supplier supplier);
     }
+
     public class SuppliersRepository : ISuppliersRepository
     {
         private readonly ApplicationDbContext _context;
@@ -26,19 +31,57 @@ namespace WarehouseManagement.Core.Repositories
         {
             return await _context.Suppliers
                 .AsNoTracking()
+                .OrderBy(s => s.BusinessName)
                 .ToListAsync();
         }
 
         public async Task<Supplier?> GetByIdAsync(int id)
         {
             return await _context.Suppliers
-                .FirstOrDefaultAsync(c => c.SupplierID == id);
+                .FirstOrDefaultAsync(s => s.SupplierID == id);
         }
 
-        public async Task<Supplier?> GetByNameAsync(string name)
+        public async Task<Supplier?> GetByIdWithDetailsAsync(int id)
         {
             return await _context.Suppliers
-                .FirstOrDefaultAsync(c => c.Name == name);
+                .Include(s => s.Contacts)
+                .Include(s => s.Attachments)
+                .Include(s => s.PurchaseOrders)
+                .FirstOrDefaultAsync(s => s.SupplierID == id);
+        }
+
+        public async Task<Supplier?> GetByBusinessNameAsync(string businessName)
+        {
+            return await _context.Suppliers
+                .FirstOrDefaultAsync(s => s.BusinessName == businessName);
+        }
+
+        public async Task<Supplier?> GetBySupplierNumberAsync(string supplierNumber)
+        {
+            return await _context.Suppliers
+                .FirstOrDefaultAsync(s => s.SupplierNumber == supplierNumber);
+        }
+
+        public async Task<Supplier?> GetLastSupplierAsync()
+        {
+            return await _context.Suppliers
+                .OrderByDescending(s => s.SupplierID)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<Supplier>> SearchAsync(string searchTerm)
+        {
+            return await _context.Suppliers
+                .Where(s => s.BusinessName.Contains(searchTerm) ||
+                           s.SupplierNumber.Contains(searchTerm) ||
+                           (s.FirstName + " " + s.LastName).Contains(searchTerm) ||
+                           s.Email.Contains(searchTerm) ||
+                           s.Telephone.Contains(searchTerm) ||
+                           s.City.Contains(searchTerm) ||
+                           s.Country.Contains(searchTerm))
+                .AsNoTracking()
+                .OrderBy(s => s.BusinessName)
+                .ToListAsync();
         }
 
         public async Task AddAsync(Supplier supplier)
@@ -55,18 +98,8 @@ namespace WarehouseManagement.Core.Repositories
 
         public async Task DeleteAsync(Supplier supplier)
         {
-            // Check if supplier has child categories
-            var hasChildren = await _context.Suppliers
-                .AnyAsync(c => c.SupplierID == supplier.SupplierID);
-
-            if (hasChildren)
-            {
-                throw new InvalidOperationException("Cannot delete a supplier that has child categories.");
-            }
-
             _context.Suppliers.Remove(supplier);
             await _context.SaveChangesAsync();
         }
     }
-
 }
